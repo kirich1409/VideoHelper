@@ -29,7 +29,7 @@ actor VideoProcessor {
 
         // 4. Add metadata
         let thumbnailData = try loadThumbnailData(from: thumbnailURL)
-        try await addMetadata(to: composition, thumbnailData: thumbnailData)
+        let metadataItem = try await addMetadata(to: composition, thumbnailData: thumbnailData)
 
         // 5. Generate output URL
         let outputURL = generateOutputURL(for: videoURL, preset: preset)
@@ -39,6 +39,7 @@ actor VideoProcessor {
             composition: composition,
             preset: preset,
             outputURL: outputURL,
+            metadataItem: metadataItem,
             progressHandler: progressHandler
         )
 
@@ -130,19 +131,20 @@ actor VideoProcessor {
         return composition
     }
 
-    private func addMetadata(to composition: AVMutableComposition, thumbnailData: Data) async throws {
+    private func addMetadata(to composition: AVMutableComposition, thumbnailData: Data) async throws -> AVMetadataItem {
         let metadataItem = AVMutableMetadataItem()
         metadataItem.identifier = .commonIdentifierArtwork
         metadataItem.dataType = kCMMetadataBaseDataType_JPEG as String
         metadataItem.value = thumbnailData as NSData
 
-        composition.metadata = [metadataItem]
+        return metadataItem
     }
 
     private func export(
         composition: AVMutableComposition,
         preset: ExportPreset,
         outputURL: URL,
+        metadataItem: AVMetadataItem,
         progressHandler: @escaping (Float, TimeInterval?) -> Void
     ) async throws {
         // Remove existing file if present
@@ -164,6 +166,7 @@ actor VideoProcessor {
         exportSession.outputURL = outputURL
         exportSession.outputFileType = .mp4
         exportSession.shouldOptimizeForNetworkUse = true // Fast start for streaming
+        exportSession.metadata = [metadataItem]
 
         // Track progress
         let startTime = Date()
@@ -193,7 +196,7 @@ actor VideoProcessor {
         }
     }
 
-    private func calculateRemainingTime(progress: Float, elapsed: TimeInterval) -> TimeInterval {
+    private nonisolated func calculateRemainingTime(progress: Float, elapsed: TimeInterval) -> TimeInterval {
         guard progress > 0 && progress < 1 else { return 0 }
         return (elapsed / Double(progress)) * Double(1 - progress)
     }
