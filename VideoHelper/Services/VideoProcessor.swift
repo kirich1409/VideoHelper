@@ -10,6 +10,7 @@ actor VideoProcessor {
     func process(
         videoURL: URL,
         thumbnailURL: URL,
+        outputURL: URL,
         preset: ExportPreset,
         progressHandler: @escaping (Float, TimeInterval?) -> Void
     ) async throws -> URL {
@@ -40,10 +41,7 @@ actor VideoProcessor {
         let thumbnailData = try loadThumbnailData(from: thumbnailURL)
         let metadataItem = try await addMetadata(to: composition, thumbnailData: thumbnailData)
 
-        // 5. Generate output URL
-        let outputURL = generateOutputURL(for: videoURL, preset: preset)
-
-        // 6. Export with progress tracking
+        // 5. Export with progress tracking
         try await export(
             composition: composition,
             preset: preset,

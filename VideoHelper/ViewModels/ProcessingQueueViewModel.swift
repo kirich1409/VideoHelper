@@ -81,10 +81,21 @@ class ProcessingQueueViewModel: ObservableObject {
             task.status = .processing
             tasks[index] = task
 
+            // Ask user where to save the file
+            guard let outputURL = await askForSaveLocation(for: task) else {
+                // User cancelled - mark as failed
+                var failedTask = tasks[index]
+                failedTask.status = .failed
+                failedTask.error = "Отменено пользователем"
+                tasks[index] = failedTask
+                continue
+            }
+
             do {
-                let outputURL = try await videoProcessor.process(
+                let finalURL = try await videoProcessor.process(
                     videoURL: task.videoURL,
                     thumbnailURL: task.thumbnailURL,
+                    outputURL: outputURL,
                     preset: task.preset,
                     progressHandler: { [weak self] progress, timeRemaining in
                         Task { @MainActor in
@@ -102,7 +113,7 @@ class ProcessingQueueViewModel: ObservableObject {
                 // Success
                 var completedTask = tasks[index]
                 completedTask.status = .completed
-                completedTask.outputURL = outputURL
+                completedTask.outputURL = finalURL
                 completedTask.progress = 1.0
                 completedTask.estimatedTimeRemaining = nil
                 tasks[index] = completedTask
@@ -123,6 +134,18 @@ class ProcessingQueueViewModel: ObservableObject {
         if totalCount > 0 {
             await notificationManager.notifyQueueCompleted(totalCount: totalCount, successCount: successCount)
         }
+    }
+
+    private func askForSaveLocation(for task: VideoTask) async -> URL? {
+        let savePanel = NSSavePanel()
+        savePanel.title = "Сохранить обработанное видео"
+        savePanel.message = "Выберите где сохранить результат"
+        savePanel.nameFieldStringValue = task.outputFileName
+        savePanel.allowedContentTypes = [.mpeg4Movie]
+        savePanel.canCreateDirectories = true
+
+        let response = savePanel.runModal()
+        return response == .OK ? savePanel.url : nil
     }
 
     private func showError(_ message: String) async {
