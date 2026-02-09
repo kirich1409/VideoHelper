@@ -138,15 +138,17 @@ class ProcessingQueueViewModel: ObservableObject {
     }
 
     private func askForSaveLocation(for task: VideoTask) async -> URL? {
-        let savePanel = NSSavePanel()
-        savePanel.title = "Сохранить обработанное видео"
-        savePanel.message = "Выберите где сохранить результат"
-        savePanel.nameFieldStringValue = task.outputFileName
-        savePanel.allowedContentTypes = [.mpeg4Movie]
-        savePanel.canCreateDirectories = true
+        return await MainActor.run {
+            let savePanel = NSSavePanel()
+            savePanel.title = "Сохранить обработанное видео"
+            savePanel.message = "Выберите где сохранить результат"
+            savePanel.nameFieldStringValue = task.outputFileName
+            savePanel.allowedContentTypes = [.mpeg4Movie]
+            savePanel.canCreateDirectories = true
 
-        let response = savePanel.runModal()
-        return response == .OK ? savePanel.url : nil
+            let response = savePanel.runModal()
+            return response == .OK ? savePanel.url : nil
+        }
     }
 
     private func showError(_ message: String) async {
