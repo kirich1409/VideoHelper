@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import Combine
 
 @MainActor
 class ProcessingQueueViewModel: ObservableObject {
