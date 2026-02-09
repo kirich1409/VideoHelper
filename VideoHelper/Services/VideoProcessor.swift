@@ -13,6 +13,15 @@ actor VideoProcessor {
         preset: ExportPreset,
         progressHandler: @escaping (Float, TimeInterval?) -> Void
     ) async throws -> URL {
+        // Start accessing security-scoped resources for sandboxed app
+        let videoAccess = videoURL.startAccessingSecurityScopedResource()
+        let thumbnailAccess = thumbnailURL.startAccessingSecurityScopedResource()
+
+        defer {
+            if videoAccess { videoURL.stopAccessingSecurityScopedResource() }
+            if thumbnailAccess { thumbnailURL.stopAccessingSecurityScopedResource() }
+        }
+
         // 1. Load assets
         let videoAsset = AVAsset(url: videoURL)
         let thumbnailImage = try loadThumbnailImage(from: thumbnailURL)
