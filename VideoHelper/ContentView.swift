@@ -62,6 +62,7 @@ struct ContentView: View {
                 }
                 .pickerStyle(.menu)
                 .frame(maxWidth: 250)
+                .accessibilityIdentifier("qualityPicker")
 
                 Spacer()
             }
@@ -72,6 +73,7 @@ struct ContentView: View {
             }
             .buttonStyle(.borderedProminent)
             .disabled(!canAddToQueue)
+            .accessibilityIdentifier("addToQueueButton")
         }
         .padding()
         .background(

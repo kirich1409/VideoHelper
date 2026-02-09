@@ -1,6 +1,5 @@
 import SwiftUI
 import UniformTypeIdentifiers
-import AppKit
 
 struct DropZoneView: View {
     let title: String
@@ -55,8 +54,6 @@ struct DropZoneView: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: 140)
-        .accessibilityLabel(title)
-        .accessibilityIdentifier("dropZone_\(title)")
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(isTargeted ? Color.accentColor.opacity(0.1) : Color.gray.opacity(0.1))
@@ -68,32 +65,16 @@ struct DropZoneView: View {
                     style: StrokeStyle(lineWidth: 2, dash: [8, 4])
                 )
         )
-        .onDrop(of: [.fileURL], isTargeted: $isTargeted) { providers in
-            guard let provider = providers.first else {
-                print("❌ No provider")
-                return false
-            }
+        .onDrop(of: acceptedTypes, isTargeted: $isTargeted) { providers in
+            guard let provider = providers.first else { return false }
 
-            print("✅ Drop received, loading file...")
-
-            // Load file URL
             _ = provider.loadObject(ofClass: URL.self) { url, error in
-                if let error = error {
-                    print("❌ Error loading URL: \(error)")
-                    return
-                }
-
                 if let url = url {
-                    print("✅ Got URL: \(url.path)")
                     DispatchQueue.main.async {
-                        self.selectedURL = url
-                        print("✅ URL set in state")
+                        selectedURL = url
                     }
-                } else {
-                    print("❌ URL is nil")
                 }
             }
-
             return true
         }
     }
