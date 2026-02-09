@@ -122,7 +122,14 @@ actor ValidationService {
     }
 
     private func checkWritePermissions(_ url: URL) throws {
-        guard FileManager.default.isWritableFile(atPath: url.path) else {
+        // For sandboxed apps, when user drops a file, we automatically
+        // get write access to the parent directory. Try creating a temp file.
+        let testURL = url.appendingPathComponent(".videohelper_test_\(UUID().uuidString)")
+
+        do {
+            try Data().write(to: testURL)
+            try? FileManager.default.removeItem(at: testURL)
+        } catch {
             throw ValidationError.noWritePermission(url)
         }
     }
