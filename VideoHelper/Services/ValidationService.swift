@@ -22,7 +22,8 @@ actor ValidationService {
         try checkOutputFileNotExists(outputURL)
 
         let outputDir = outputURL.deletingLastPathComponent()
-        try checkWritePermissions(outputDir)
+        // Skip write permission check for sandboxed apps - will be checked during export
+        // try checkWritePermissions(outputDir)
 
         let estimatedSize = try await estimateOutputSize(videoURL: videoURL, preset: preset)
         try checkDiskSpace(in: outputDir, required: estimatedSize)
