@@ -68,14 +68,25 @@ struct DropZoneView: View {
         .onDrop(of: acceptedTypes, isTargeted: $isTargeted) { providers in
             guard let provider = providers.first else { return false }
 
-            _ = provider.loadObject(ofClass: URL.self) { url, error in
-                if let url = url {
-                    DispatchQueue.main.async {
-                        selectedURL = url
+            // Try to load as file URL (for Finder drops)
+            if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+                provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, error in
+                    if let data = item as? Data,
+                       let path = String(data: data, encoding: .utf8),
+                       let url = URL(string: path) {
+                        DispatchQueue.main.async {
+                            selectedURL = url
+                        }
+                    } else if let url = item as? URL {
+                        DispatchQueue.main.async {
+                            selectedURL = url
+                        }
                     }
                 }
+                return true
             }
-            return true
+
+            return false
         }
     }
 }
