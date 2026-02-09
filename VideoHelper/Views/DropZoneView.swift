@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import AppKit
 
 struct DropZoneView: View {
     let title: String
@@ -65,28 +66,33 @@ struct DropZoneView: View {
                     style: StrokeStyle(lineWidth: 2, dash: [8, 4])
                 )
         )
-        .onDrop(of: acceptedTypes, isTargeted: $isTargeted) { providers in
-            guard let provider = providers.first else { return false }
-
-            // Try to load as file URL (for Finder drops)
-            if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
-                provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, error in
-                    if let data = item as? Data,
-                       let path = String(data: data, encoding: .utf8),
-                       let url = URL(string: path) {
-                        DispatchQueue.main.async {
-                            selectedURL = url
-                        }
-                    } else if let url = item as? URL {
-                        DispatchQueue.main.async {
-                            selectedURL = url
-                        }
-                    }
-                }
-                return true
+        .onDrop(of: [.fileURL], isTargeted: $isTargeted) { providers in
+            guard let provider = providers.first else {
+                print("❌ No provider")
+                return false
             }
 
-            return false
+            print("✅ Drop received, loading file...")
+
+            // Load file URL
+            _ = provider.loadObject(ofClass: URL.self) { url, error in
+                if let error = error {
+                    print("❌ Error loading URL: \(error)")
+                    return
+                }
+
+                if let url = url {
+                    print("✅ Got URL: \(url.path)")
+                    DispatchQueue.main.async {
+                        self.selectedURL = url
+                        print("✅ URL set in state")
+                    }
+                } else {
+                    print("❌ URL is nil")
+                }
+            }
+
+            return true
         }
     }
 }
