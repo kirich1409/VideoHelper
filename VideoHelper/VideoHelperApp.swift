@@ -1,32 +1,49 @@
-//
-//  VideoHelperApp.swift
-//  VideoHelper
-//
-//  Created by Kirill Rozov on 9.02.26.
-//
-
 import SwiftUI
-import SwiftData
 
 @main
 struct VideoHelperApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var queueViewModel = ProcessingQueueViewModel()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(queueViewModel)
+                .onAppear {
+                    appDelegate.queueViewModel = queueViewModel
+                }
         }
-        .modelContainer(sharedModelContainer)
+        .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
+        .defaultSize(width: 600, height: 700)
+        .commands {
+            CommandGroup(replacing: .newItem) { }
+        }
+    }
+}
+
+class AppDelegate: NSObject, NSApplicationDelegate {
+    var queueViewModel: ProcessingQueueViewModel?
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return true
+    }
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard let viewModel = queueViewModel else { return .terminateNow }
+
+        if viewModel.hasActiveTasks {
+            let alert = NSAlert()
+            alert.messageText = "Обработка видео в процессе"
+            alert.informativeText = "Вы уверены что хотите выйти? Незавершенные задачи будут отменены."
+            alert.addButton(withTitle: "Отмена")
+            alert.addButton(withTitle: "Выйти")
+            alert.alertStyle = .warning
+
+            let response = alert.runModal()
+            return response == .alertFirstButtonReturn ? .terminateCancel : .terminateNow
+        }
+
+        return .terminateNow
     }
 }
