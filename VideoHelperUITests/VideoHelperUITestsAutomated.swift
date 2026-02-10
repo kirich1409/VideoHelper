@@ -1,9 +1,8 @@
-import XCTest
-
-// Disable strict concurrency checking for UI tests as XCUIApplication APIs
-// are MainActor-isolated but XCTestCase lifecycle methods cannot be MainActor.
+// XCUIApplication APIs are MainActor-isolated but XCTestCase lifecycle methods
+// cannot be MainActor. Using @preconcurrency import suppresses these warnings.
 // UI tests always run on main thread, so this is safe.
-@preconcurrency
+@preconcurrency import XCTest
+
 final class VideoHelperUITestsAutomated: XCTestCase {
 
     nonisolated(unsafe) var app: XCUIApplication!
