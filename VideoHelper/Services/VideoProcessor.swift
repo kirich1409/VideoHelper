@@ -92,8 +92,8 @@ actor VideoProcessor {
     }
 
     private func getFrameRate(from asset: AVAsset) async throws -> Float {
-        let tracks = try await asset.load(.tracks)
-        guard let videoTrack = tracks.first(where: { $0.mediaType == .video }) else {
+        let videoTracks = try await asset.loadTracks(withMediaType: .video)
+        guard let videoTrack = videoTracks.first else {
             throw NSError(domain: "VideoProcessor", code: 2, userInfo: [NSLocalizedDescriptionKey: "No video track found"])
         }
 
@@ -127,8 +127,8 @@ actor VideoProcessor {
         }
 
         // Get source tracks
-        let sourceTracks = try await video.load(.tracks)
-        guard let sourceVideoTrack = sourceTracks.first(where: { $0.mediaType == .video }) else {
+        let sourceVideoTracks = try await video.loadTracks(withMediaType: .video)
+        guard let sourceVideoTrack = sourceVideoTracks.first else {
             throw NSError(domain: "VideoProcessor", code: 5, userInfo: [NSLocalizedDescriptionKey: "No source video track"])
         }
 
@@ -143,7 +143,8 @@ actor VideoProcessor {
         )
 
         // Insert audio if available
-        if let sourceAudioTrack = sourceTracks.first(where: { $0.mediaType == .audio }) {
+        let sourceAudioTracks = try await video.loadTracks(withMediaType: .audio)
+        if let sourceAudioTrack = sourceAudioTracks.first {
             try audioCompositionTrack.insertTimeRange(
                 videoTimeRange,
                 of: sourceAudioTrack,
