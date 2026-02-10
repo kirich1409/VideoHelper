@@ -22,6 +22,7 @@ struct VideoHelperApp: App {
     }
 }
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     var queueViewModel: ProcessingQueueViewModel?
 

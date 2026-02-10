@@ -19,7 +19,7 @@ enum ExportPreset: String, CaseIterable, Identifiable {
         }
     }
 
-    var filenameSuffix: String {
+    nonisolated var filenameSuffix: String {
         switch self {
         case .uhd4K: return "_4K"
         case .fullHD: return "_1080p"
@@ -29,7 +29,7 @@ enum ExportPreset: String, CaseIterable, Identifiable {
         }
     }
 
-    var targetBitrate: Int64 {
+    nonisolated var targetBitrate: Int64 {
         switch self {
         case .uhd4K: return 20_000_000 // 20 Mbps
         case .fullHD: return 8_000_000 // 8 Mbps
@@ -39,7 +39,7 @@ enum ExportPreset: String, CaseIterable, Identifiable {
         }
     }
 
-    var maxResolution: CGSize? {
+    nonisolated var maxResolution: CGSize? {
         switch self {
         case .uhd4K: return CGSize(width: 3840, height: 2160)
         case .fullHD: return CGSize(width: 1920, height: 1080)
