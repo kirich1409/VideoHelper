@@ -541,6 +541,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "-strict-concurrency=minimal";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.androidbroadcast.VideoHelperUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -565,6 +566,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "-strict-concurrency=minimal";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.androidbroadcast.VideoHelperUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
