@@ -288,7 +288,8 @@ actor VideoProcessor {
 
             print("📊 Progress: \(progress), Remaining: \(estimatedRemaining ?? 0)s, Status: \(exportSession.status.rawValue)")
 
-            await MainActor.run {
+            // Fire-and-forget update to avoid deadlock
+            Task { @MainActor in
                 progressHandler(progress, estimatedRemaining)
             }
 
@@ -301,7 +302,9 @@ actor VideoProcessor {
         // Check result
         switch exportSession.status {
         case .completed:
-            progressHandler(1.0, 0)
+            Task { @MainActor in
+                progressHandler(1.0, 0)
+            }
         case .failed:
             throw exportSession.error ?? NSError(domain: "VideoProcessor", code: 7, userInfo: [NSLocalizedDescriptionKey: "Export failed"])
         case .cancelled:
