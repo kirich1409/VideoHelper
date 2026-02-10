@@ -27,23 +27,25 @@ jobs:
     - name: Clean build folder
       run: xcodebuild clean -project VideoHelper.xcodeproj -scheme VideoHelper
 
-    - name: Build main app
+    - name: Build project (skip UI tests)
       run: |
-        xcodebuild build \
+        xcodebuild build-for-testing \
           -project VideoHelper.xcodeproj \
-          -target VideoHelper \
+          -scheme VideoHelper \
           -configuration Debug \
           -destination 'platform=macOS' \
+          -skip-testing:VideoHelperUITests \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
 
-    - name: Build and run unit tests
+    - name: Run unit tests only
       run: |
-        xcodebuild test \
+        xcodebuild test-without-building \
           -project VideoHelper.xcodeproj \
-          -target VideoHelperTests \
+          -scheme VideoHelper \
           -destination 'platform=macOS' \
+          -only-testing:VideoHelperTests \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
