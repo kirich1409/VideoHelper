@@ -85,21 +85,21 @@ actor ValidationService {
         let durationInSeconds = CMTimeGetSeconds(duration)
 
         switch preset {
-        case .original:
-            // Original: input size + 10% buffer
-            let attributes = try FileManager.default.attributesOfItem(atPath: videoURL.path)
-            let fileSize = attributes[.size] as? Int64 ?? 0
-            return Int64(Double(fileSize) * 1.1)
+        case .fullHD:
+            // Full HD: 4 Mbps video + 128 kbps audio
+            let videoBitrate: Int64 = 4_000_000
+            let audioBitrate: Int64 = 128_000
+            return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
 
-        case .telegramSD:
-            // SD: 2 Mbps video + 128 kbps audio
+        case .hd:
+            // HD: 2 Mbps video + 128 kbps audio
             let videoBitrate: Int64 = 2_000_000
             let audioBitrate: Int64 = 128_000
             return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
 
-        case .telegramHD:
-            // HD: 4 Mbps video + 128 kbps audio
-            let videoBitrate: Int64 = 4_000_000
+        case .sd:
+            // SD: 1 Mbps video + 128 kbps audio
+            let videoBitrate: Int64 = 1_000_000
             let audioBitrate: Int64 = 128_000
             return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
         }

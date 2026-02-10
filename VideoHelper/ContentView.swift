@@ -7,7 +7,7 @@ struct ContentView: View {
 
     @State private var selectedVideo: URL?
     @State private var selectedThumbnail: URL?
-    @State private var selectedPreset: ExportPreset = .original
+    @State private var selectedPreset: ExportPreset = .fullHD
     @State private var hasUserResized = false
 
     var body: some View {
