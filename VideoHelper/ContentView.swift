@@ -16,8 +16,10 @@ struct ContentView: View {
             // Settings Section
             settingsSection
 
-            // Queue Section
-            queueSection
+            // Queue Section - only show when not empty
+            if !viewModel.tasks.isEmpty {
+                queueSection
+            }
         }
         .padding()
         .frame(minWidth: 480, minHeight: 600)
@@ -101,34 +103,24 @@ struct ContentView: View {
                 }
             }
 
-            if viewModel.tasks.isEmpty {
-                VStack {
-                    Spacer()
-                    Text("Очередь пуста")
-                        .foregroundColor(.secondary)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-            } else {
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        ForEach(viewModel.tasks) { task in
-                            QueueItemView(
-                                task: task,
-                                onRemove: {
-                                    viewModel.removeTask(id: task.id)
-                                },
-                                onShowInFinder: {
-                                    if let url = task.outputURL {
-                                        viewModel.showInFinder(url: url)
-                                    }
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    ForEach(viewModel.tasks) { task in
+                        QueueItemView(
+                            task: task,
+                            onRemove: {
+                                viewModel.removeTask(id: task.id)
+                            },
+                            onShowInFinder: {
+                                if let url = task.outputURL {
+                                    viewModel.showInFinder(url: url)
                                 }
-                            )
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.gray.opacity(0.05))
-                            )
-                        }
+                            }
+                        )
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.gray.opacity(0.05))
+                        )
                     }
                 }
             }
