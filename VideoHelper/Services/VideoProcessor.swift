@@ -254,9 +254,9 @@ actor VideoProcessor {
         let exportPresetName: String
         switch preset {
         case .original:
-            exportPresetName = AVAssetExportPresetHighestQuality
+            exportPresetName = AVAssetExportPresetPassthrough // Preserve original quality without re-encoding
         case .telegramSD, .telegramHD:
-            exportPresetName = AVAssetExportPresetHEVCHighestQuality // We'll use custom settings
+            exportPresetName = AVAssetExportPresetHEVC1920x1080 // HEVC for compressed formats
         }
 
         guard let exportSession = AVAssetExportSession(asset: composition, presetName: exportPresetName) else {
@@ -269,20 +269,29 @@ actor VideoProcessor {
         exportSession.metadata = [metadataItem]
         exportSession.videoComposition = videoComposition
 
-        // Track progress
+        // Track progress with async polling
         let startTime = Date()
-        let progressTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-            Task { @MainActor in
-                let progress = exportSession.progress
-                let elapsed = Date().timeIntervalSince(startTime)
-                let estimatedRemaining = self.calculateRemainingTime(progress: progress, elapsed: elapsed)
-                progressHandler(progress, estimatedRemaining)
-            }
+
+        // Start export task
+        let exportTask = Task {
+            await exportSession.export()
         }
 
-        // Export
-        await exportSession.export()
-        progressTimer.invalidate()
+        // Poll progress
+        while !exportTask.isCancelled && exportSession.status == .waiting || exportSession.status == .exporting {
+            let progress = exportSession.progress
+            let elapsed = Date().timeIntervalSince(startTime)
+            let estimatedRemaining = calculateRemainingTime(progress: progress, elapsed: elapsed)
+
+            Task { @MainActor in
+                progressHandler(progress, estimatedRemaining)
+            }
+
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
+        }
+
+        // Wait for export to complete
+        await exportTask.value
 
         // Check result
         switch exportSession.status {
