@@ -27,21 +27,20 @@ jobs:
     - name: Clean build folder
       run: xcodebuild clean -project VideoHelper.xcodeproj -scheme VideoHelper
 
-    - name: Build project (skip UI tests)
+    - name: Build project
       run: |
-        xcodebuild build-for-testing \
+        xcodebuild build \
           -project VideoHelper.xcodeproj \
           -scheme VideoHelper \
           -configuration Debug \
           -destination 'platform=macOS' \
-          -skip-testing:VideoHelperUITests \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
 
-    - name: Run unit tests only
+    - name: Run unit tests
       run: |
-        xcodebuild test-without-building \
+        xcodebuild test \
           -project VideoHelper.xcodeproj \
           -scheme VideoHelper \
           -destination 'platform=macOS' \
@@ -67,5 +66,6 @@ jobs:
           | xcpretty --color --report junit
       continue-on-error: true
 
-    # UI tests are skipped in CI due to XCTest + Swift 6 concurrency issues on GitHub Actions
+    # UI tests are skipped in CI due to XCTest + Swift 6 concurrency compilation issues on GitHub Actions
     # They work fine locally with SWIFT_STRICT_CONCURRENCY=minimal setting
+    # Regular 'build' command avoids compiling test targets, then 'test -only-testing' runs only unit tests
