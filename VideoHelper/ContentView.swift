@@ -241,20 +241,25 @@ struct ContentView: View {
 struct WindowAccessor: NSViewRepresentable {
     let onWindowResize: @MainActor () -> Void
 
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onWindowResize: onWindowResize)
+    }
+
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
 
         Task { @MainActor in
             if let window = view.window {
-                NotificationCenter.default.addObserver(
+                let token = NotificationCenter.default.addObserver(
                     forName: NSWindow.didResizeNotification,
                     object: window,
                     queue: .main
                 ) { [onWindowResize] _ in
-                    Task { @MainActor in
+                    MainActor.assumeIsolated {
                         onWindowResize()
                     }
                 }
+                context.coordinator.observerToken = token
             }
         }
 
@@ -262,6 +267,27 @@ struct WindowAccessor: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {}
+
+    static func dismantleNSView(_ nsView: NSView, coordinator: Coordinator) {
+        coordinator.removeObserver()
+    }
+
+    @MainActor
+    class Coordinator {
+        let onWindowResize: () -> Void
+        var observerToken: NSObjectProtocol?
+
+        init(onWindowResize: @escaping @MainActor () -> Void) {
+            self.onWindowResize = onWindowResize
+        }
+
+        func removeObserver() {
+            if let token = observerToken {
+                NotificationCenter.default.removeObserver(token)
+                observerToken = nil
+            }
+        }
+    }
 }
 
 #Preview {
