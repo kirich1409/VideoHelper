@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 VideoHelper is a native macOS application for adding custom thumbnails to videos with drag-and-drop simplicity. Built with Swift and SwiftUI, it uses AVFoundation for video processing and supports bilingual localization (English/Russian).
 
 **Bundle ID**: `dev.androidbroadcast.VideoHelper`
-**Deployment Target**: macOS 26.2+
+**Deployment Target**: macOS 14.0+
 **Architecture**: MVVM with Swift Concurrency (async/await + actors)
 
 ## Building and Running
