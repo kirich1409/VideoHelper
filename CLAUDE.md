@@ -322,3 +322,14 @@ Use real video files, not test stubs. Recommended test files:
 - Manual testing should cover: various video formats, different resolutions, audio-only files, corrupted files
 - Test sandboxing: verify security-scoped resource access, NSSavePanel flow
 - Localization testing: switch system language between English and Russian
+
+### Swift 6 Concurrency in Tests
+
+**Main app and unit tests**: Use Swift 6.0 language mode with strict concurrency checking (`SWIFT_STRICT_CONCURRENCY = complete`).
+
+**UI tests**: Use `SWIFT_STRICT_CONCURRENCY = minimal` due to XCTest/XCUIApplication concurrency issues:
+- XCUIApplication and related XCTest APIs are `@MainActor` isolated in Swift 6
+- Test methods need to be synchronous per XCTest requirements
+- Using `minimal` allows tests to compile while maintaining type safety
+- This is a temporary workaround until XCTest fully supports Swift 6 strict concurrency
+- UI tests are skipped on CI (via `EXCLUDED_SOURCE_FILE_NAMES`) but work fine locally
