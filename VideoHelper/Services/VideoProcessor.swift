@@ -278,12 +278,12 @@ actor VideoProcessor {
         }
 
         // Poll progress
-        while !exportTask.isCancelled && exportSession.status == .waiting || exportSession.status == .exporting {
+        while !exportTask.isCancelled && (exportSession.status == .waiting || exportSession.status == .exporting) {
             let progress = exportSession.progress
             let elapsed = Date().timeIntervalSince(startTime)
             let estimatedRemaining = calculateRemainingTime(progress: progress, elapsed: elapsed)
 
-            Task { @MainActor in
+            await MainActor.run {
                 progressHandler(progress, estimatedRemaining)
             }
 
