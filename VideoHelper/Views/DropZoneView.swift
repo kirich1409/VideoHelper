@@ -104,6 +104,8 @@ struct DropZoneView: View {
                                 self.selectedURL = url
                                 if let cgImage = cgImage {
                                     self.videoThumbnail = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+                                } else {
+                                    self.videoThumbnail = nil
                                 }
                                 print("✅ URL and thumbnail set in state")
                             }
