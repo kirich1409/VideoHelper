@@ -107,7 +107,7 @@ struct DropZoneView: View {
                             }
                         }
                     } else {
-                        DispatchQueue.main.async {
+                        Task { @MainActor in
                             self.selectedURL = url
                             print("✅ URL set in state")
                         }
