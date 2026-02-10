@@ -24,7 +24,7 @@ struct ContentView: View {
             queueSection
         }
         .padding()
-        .frame(minWidth: 600, minHeight: 650)
+        .frame(minWidth: 600, minHeight: 650) // minHeight matches default window height in VideoHelperApp
         .task {
             await NotificationManager.shared.requestAuthorization()
         }
