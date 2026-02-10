@@ -15,7 +15,7 @@ struct VideoHelperApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
-        .defaultSize(width: 600, height: 400)
+        .defaultSize(width: 600, height: 650)
         .commands {
             CommandGroup(replacing: .newItem) { }
         }

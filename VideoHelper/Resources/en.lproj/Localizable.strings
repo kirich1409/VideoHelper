@@ -9,6 +9,7 @@
 "quality" = "Quality:";
 "add_to_queue" = "Add to Queue";
 "queue_title" = "Processing Queue";
+"queue_empty" = "Queue is empty";
 "processing" = "Processing...";
 "estimated_size" = "Estimated size: %@";
 
