@@ -4,6 +4,8 @@ disabled_rules:
 opt_in_rules:
   - empty_count
   - explicit_init
+  # TODO: Consider adding custom rule to enforce nonisolated keyword consistency
+  # for actor methods that don't need isolation (synchronous, pure functions)
 
 included:
   - VideoHelper
