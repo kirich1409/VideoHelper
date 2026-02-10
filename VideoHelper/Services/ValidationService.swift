@@ -58,8 +58,7 @@ actor ValidationService {
 
         // Check for video tracks
         do {
-            let tracks = try await asset.load(.tracks)
-            let videoTracks = tracks.filter { $0.mediaType == .video }
+            let videoTracks = try await asset.loadTracks(withMediaType: .video)
             guard !videoTracks.isEmpty else {
                 throw ValidationError.unsupportedVideoFormat(url.lastPathComponent)
             }
