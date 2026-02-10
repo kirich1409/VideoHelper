@@ -49,11 +49,10 @@ final class VideoHelperUITestsAutomated: XCTestCase {
         let picker = app.popUpButtons.firstMatch
         XCTAssertTrue(picker.exists)
 
-        picker.click()
+        // Get initial picker value
+        let initialTitle = picker.title
 
-        // Check for preset options (at least 3 should exist)
-        let menuItems = app.menuItems
-        XCTAssertGreaterThanOrEqual(menuItems.count, 3, "Should have at least 3 quality presets")
+        picker.click()
 
         // Verify specific presets exist
         let telegramHDOption = app.menuItems["Telegram HD (1080p)"]
@@ -64,11 +63,12 @@ final class VideoHelperUITestsAutomated: XCTestCase {
         XCTAssertTrue(telegramSDOption.exists, "Telegram SD option should exist")
         XCTAssertTrue(fullHDOption.exists, "Full HD option should exist")
 
-        // Click a menu item to verify interaction works
+        // Select Telegram HD
         telegramHDOption.click()
 
-        // Verify menu closes after selection
-        XCTAssertFalse(telegramHDOption.exists, "Menu should close after selection")
+        // Verify picker's displayed value changed
+        XCTAssertTrue(picker.title.contains("Telegram HD"), "Picker should display selected preset")
+        XCTAssertNotEqual(picker.title, initialTitle, "Picker value should have changed")
     }
 
     func testAddToQueueButtonExists() throws {
