@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import AppKit
 
 struct ContentView: View {
     @StateObject private var viewModel = ProcessingQueueViewModel()
@@ -7,6 +8,7 @@ struct ContentView: View {
     @State private var selectedVideo: URL?
     @State private var selectedThumbnail: URL?
     @State private var selectedPreset: ExportPreset = .original
+    @State private var hasUserResized = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -26,6 +28,15 @@ struct ContentView: View {
         .task {
             await NotificationManager.shared.requestAuthorization()
         }
+        .onChange(of: viewModel.tasks.isEmpty) { oldValue, newValue in
+            // When queue becomes non-empty, expand window
+            if oldValue == true && newValue == false && !hasUserResized {
+                expandWindowForQueue()
+            }
+        }
+        .background(WindowAccessor(onWindowResize: {
+            hasUserResized = true
+        }))
     }
 
     // MARK: - Drop Zone Section
@@ -145,6 +156,50 @@ struct ContentView: View {
             selectedThumbnail = nil
         }
     }
+
+    private func expandWindowForQueue() {
+        DispatchQueue.main.async {
+            if let window = NSApplication.shared.keyWindow {
+                var frame = window.frame
+                let targetHeight: CGFloat = 650
+
+                // Only expand if current height is less than target
+                if frame.size.height < targetHeight {
+                    let heightDiff = targetHeight - frame.size.height
+                    frame.origin.y -= heightDiff // Move window up to keep top position
+                    frame.size.height = targetHeight
+
+                    window.setFrame(frame, display: true, animate: true)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Window Accessor Helper
+
+struct WindowAccessor: NSViewRepresentable {
+    let onWindowResize: () -> Void
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+
+        DispatchQueue.main.async {
+            if let window = view.window {
+                NotificationCenter.default.addObserver(
+                    forName: NSWindow.didResizeNotification,
+                    object: window,
+                    queue: .main
+                ) { _ in
+                    onWindowResize()
+                }
+            }
+        }
+
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
 #Preview {
