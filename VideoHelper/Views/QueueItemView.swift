@@ -101,11 +101,11 @@ struct QueueItemView: View {
 
         case .completed:
             Button(action: onShowInFinder) {
-                Text("Показать в Finder")
-                    .font(.caption)
+                Image(systemName: "folder")
+                    .foregroundColor(.blue)
             }
-            .buttonStyle(.borderedProminent)
-            .help("Открыть файл в Finder")
+            .buttonStyle(.plain)
+            .help("Показать в Finder")
 
         case .processing:
             ProgressView()

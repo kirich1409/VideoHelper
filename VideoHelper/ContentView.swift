@@ -161,7 +161,7 @@ struct ContentView: View {
         DispatchQueue.main.async {
             if let window = NSApplication.shared.keyWindow {
                 var frame = window.frame
-                let targetHeight: CGFloat = 650
+                let targetHeight: CGFloat = 500
 
                 // Only expand if current height is less than target
                 if frame.size.height < targetHeight {
@@ -169,7 +169,12 @@ struct ContentView: View {
                     frame.origin.y -= heightDiff // Move window up to keep top position
                     frame.size.height = targetHeight
 
-                    window.setFrame(frame, display: true, animate: true)
+                    // Smooth animation with NSAnimationContext
+                    NSAnimationContext.runAnimationGroup({ context in
+                        context.duration = 0.3
+                        context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                        window.animator().setFrame(frame, display: true)
+                    })
                 }
             }
         }
