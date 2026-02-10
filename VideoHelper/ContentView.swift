@@ -1,6 +1,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 import AppKit
+import AVFoundation
 
 struct ContentView: View {
     @StateObject private var viewModel = ProcessingQueueViewModel()
@@ -9,6 +10,7 @@ struct ContentView: View {
     @State private var selectedThumbnail: URL?
     @State private var selectedPreset: ExportPreset = .fullHD
     @State private var hasUserResized = false
+    @State private var estimatedSize: String = ""
 
     var body: some View {
         VStack(spacing: 20) {
@@ -49,6 +51,9 @@ struct ContentView: View {
                 acceptedTypes: [.movie, .mpeg4Movie, .quickTimeMovie],
                 selectedURL: $selectedVideo
             )
+            .onChange(of: selectedVideo) { _, _ in
+                updateEstimatedSize()
+            }
 
             DropZoneView(
                 title: "Перетащите картинку",
@@ -76,8 +81,22 @@ struct ContentView: View {
                 .pickerStyle(.menu)
                 .frame(maxWidth: 250)
                 .accessibilityIdentifier("qualityPicker")
+                .onChange(of: selectedPreset) { _, _ in
+                    updateEstimatedSize()
+                }
 
                 Spacer()
+            }
+
+            if !estimatedSize.isEmpty {
+                HStack {
+                    Image(systemName: "doc.badge.gearshape")
+                        .foregroundColor(.secondary)
+                    Text("Примерный размер: \(estimatedSize)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
             }
 
             Button(action: addToQueue) {
@@ -175,6 +194,35 @@ struct ContentView: View {
                         context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
                         window.animator().setFrame(frame, display: true)
                     })
+                }
+            }
+        }
+    }
+
+    private func updateEstimatedSize() {
+        guard let videoURL = selectedVideo else {
+            estimatedSize = ""
+            return
+        }
+
+        Task {
+            do {
+                let asset = AVAsset(url: videoURL)
+                let duration = try await asset.load(.duration)
+                let durationInSeconds = CMTimeGetSeconds(duration)
+
+                let bitrate = selectedPreset.targetBitrate
+                let audioBitrate: Int64 = 192_000 // Average audio bitrate
+
+                let estimatedBytes = Int64(durationInSeconds * Double(bitrate + audioBitrate) / 8.0)
+                let formattedSize = ByteCountFormatter.string(fromByteCount: estimatedBytes, countStyle: .file)
+
+                await MainActor.run {
+                    estimatedSize = formattedSize
+                }
+            } catch {
+                await MainActor.run {
+                    estimatedSize = ""
                 }
             }
         }
