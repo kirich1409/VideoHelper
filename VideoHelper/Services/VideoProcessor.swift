@@ -7,7 +7,7 @@ actor VideoProcessor {
 
     // MARK: - Public API
 
-    func process(
+    nonisolated func process(
         videoURL: URL,
         thumbnailURL: URL,
         outputURL: URL,
