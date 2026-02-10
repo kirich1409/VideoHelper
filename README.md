@@ -4,7 +4,7 @@ A native macOS application for adding custom thumbnails to videos with one click
 
 Нативное macOS приложение для добавления пользовательских миниатюр к видео в один клик.
 
-![macOS](https://img.shields.io/badge/macOS-26.0+-blue)
+![macOS](https://img.shields.io/badge/macOS-14.0+-blue)
 ![Swift](https://img.shields.io/badge/Swift-5.9-orange)
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-4.0-green)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)

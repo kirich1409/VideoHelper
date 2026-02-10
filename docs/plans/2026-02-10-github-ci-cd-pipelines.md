@@ -6,7 +6,7 @@
 
 **Architecture:** Two separate workflows using GitHub Actions - `pr-checks.yml` for automated PR validation and `release-build.yml` for manual release builds. Both use macOS runners with Xcode pre-installed. PR checks run on every pull request and verify build + tests. Release workflow uses workflow_dispatch for manual triggering.
 
-**Tech Stack:** GitHub Actions, Xcode 16+, xcodebuild, macOS 26.2+ runners
+**Tech Stack:** GitHub Actions, Xcode 16+, xcodebuild, macOS 15 runners
 
 ---
 
