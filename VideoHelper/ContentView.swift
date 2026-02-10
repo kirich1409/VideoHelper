@@ -22,7 +22,7 @@ struct ContentView: View {
             }
         }
         .padding()
-        .frame(minWidth: 480, minHeight: 600)
+        .frame(minWidth: 600)
         .task {
             await NotificationManager.shared.requestAuthorization()
         }
