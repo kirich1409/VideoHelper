@@ -9,6 +9,7 @@
 "quality" = "Качество:";
 "add_to_queue" = "Добавить в очередь";
 "queue_title" = "Очередь обработки";
+"queue_empty" = "Очередь пуста";
 "processing" = "Обработка...";
 "estimated_size" = "Примерный размер: %@";
 

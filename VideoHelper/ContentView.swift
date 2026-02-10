@@ -20,19 +20,17 @@ struct ContentView: View {
             // Settings Section
             settingsSection
 
-            // Queue Section - only show when not empty
-            if !viewModel.tasks.isEmpty {
-                queueSection
-            }
+            // Queue Section
+            queueSection
         }
         .padding()
-        .frame(minWidth: 600)
+        .frame(minWidth: 600, minHeight: 600)
         .task {
             await NotificationManager.shared.requestAuthorization()
         }
-        .onChange(of: viewModel.tasks.isEmpty) { oldValue, newValue in
-            // When queue becomes non-empty, expand window
-            if oldValue == true && newValue == false && !hasUserResized {
+        .onChange(of: viewModel.tasks.count) { oldValue, newValue in
+            // When first task is added, expand window
+            if oldValue == 0 && newValue == 1 && !hasUserResized {
                 expandWindowForQueue()
             }
         }
@@ -137,25 +135,33 @@ struct ContentView: View {
 
             ScrollView {
                 LazyVStack(spacing: 8) {
-                    ForEach(viewModel.tasks) { task in
-                        QueueItemView(
-                            task: task,
-                            onRemove: {
-                                viewModel.removeTask(id: task.id)
-                            },
-                            onShowInFinder: {
-                                if let url = task.outputURL {
-                                    viewModel.showInFinder(url: url)
+                    if viewModel.tasks.isEmpty {
+                        Text(NSLocalizedString("queue_empty", comment: ""))
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
+                    } else {
+                        ForEach(viewModel.tasks) { task in
+                            QueueItemView(
+                                task: task,
+                                onRemove: {
+                                    viewModel.removeTask(id: task.id)
+                                },
+                                onShowInFinder: {
+                                    if let url = task.outputURL {
+                                        viewModel.showInFinder(url: url)
+                                    }
                                 }
-                            }
-                        )
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.gray.opacity(0.05))
-                        )
+                            )
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.gray.opacity(0.05))
+                            )
+                        }
                     }
                 }
             }
+            .frame(minHeight: 100)
         }
         .frame(maxHeight: .infinity)
     }
