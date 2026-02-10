@@ -99,10 +99,12 @@ struct DropZoneView: View {
                     // Generate video thumbnail if it's a video file
                     if self.acceptedTypes.contains(.movie) {
                         Task {
-                            let thumbnail = await self.generateVideoThumbnail(from: url)
+                            let cgImage = await self.generateVideoThumbnail(from: url)
                             await MainActor.run {
                                 self.selectedURL = url
-                                self.videoThumbnail = thumbnail
+                                if let cgImage = cgImage {
+                                    self.videoThumbnail = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+                                }
                                 print("✅ URL and thumbnail set in state")
                             }
                         }
@@ -123,7 +125,7 @@ struct DropZoneView: View {
 
     // MARK: - Video Thumbnail Generation
 
-    private func generateVideoThumbnail(from url: URL) async -> NSImage? {
+    private func generateVideoThumbnail(from url: URL) async -> CGImage? {
         let asset = AVAsset(url: url)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
         imageGenerator.appliesPreferredTrackTransform = true
@@ -131,7 +133,7 @@ struct DropZoneView: View {
 
         do {
             let cgImage = try await imageGenerator.image(at: .zero).image
-            return NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+            return cgImage
         } catch {
             print("❌ Failed to generate video thumbnail: \(error)")
             return nil
