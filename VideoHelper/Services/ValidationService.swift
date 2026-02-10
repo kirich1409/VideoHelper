@@ -97,9 +97,21 @@ actor ValidationService {
             let audioBitrate: Int64 = 192_000
             return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
 
+        case .telegramHD:
+            // Telegram HD: 4 Mbps video + 128 kbps audio
+            let videoBitrate: Int64 = 4_000_000
+            let audioBitrate: Int64 = 128_000
+            return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
+
         case .hd:
             // HD: 4 Mbps video + 128 kbps audio
             let videoBitrate: Int64 = 4_000_000
+            let audioBitrate: Int64 = 128_000
+            return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
+
+        case .telegramSD:
+            // Telegram SD: 2 Mbps video + 128 kbps audio
+            let videoBitrate: Int64 = 2_000_000
             let audioBitrate: Int64 = 128_000
             return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
         }

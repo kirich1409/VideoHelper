@@ -252,9 +252,9 @@ actor VideoProcessor {
         switch preset {
         case .uhd4K:
             exportPresetName = AVAssetExportPreset3840x2160 // 4K
-        case .fullHD:
+        case .fullHD, .telegramHD:
             exportPresetName = AVAssetExportPreset1920x1080 // 1080p
-        case .hd:
+        case .hd, .telegramSD:
             exportPresetName = AVAssetExportPreset1280x720 // 720p
         }
 
