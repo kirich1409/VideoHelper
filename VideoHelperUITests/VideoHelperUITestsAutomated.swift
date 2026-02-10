@@ -20,6 +20,7 @@ final class VideoHelperUITestsAutomated: XCTestCase {
 
     // MARK: - UI Element Tests
 
+    @MainActor
     func testAppLaunches() throws {
         // Verify app launched successfully
         XCTAssertTrue(app.exists)
