@@ -1,0 +1,98 @@
+name: Release Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: true
+        type: string
+      create_github_release:
+        description: 'Create GitHub Release'
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  build-release:
+    name: Build Release
+    runs-on: macos-15
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+
+    - name: Show Xcode version
+      run: xcodebuild -version
+
+    - name: Clean build folder
+      run: xcodebuild clean -project VideoHelper.xcodeproj -scheme VideoHelper
+
+    - name: Build Release
+      run: |
+        xcodebuild archive \
+          -project VideoHelper.xcodeproj \
+          -scheme VideoHelper \
+          -configuration Release \
+          -archivePath ./build/VideoHelper.xcarchive \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+
+    - name: Export .app bundle
+      run: |
+        mkdir -p ./build/export
+        cp -R ./build/VideoHelper.xcarchive/Products/Applications/VideoHelper.app ./build/export/
+
+    - name: Create ZIP archive
+      run: |
+        cd ./build/export
+        zip -r VideoHelper-${{ github.event.inputs.version }}.zip VideoHelper.app
+        cd ../..
+
+    - name: Calculate checksum
+      run: |
+        shasum -a 256 ./build/export/VideoHelper-${{ github.event.inputs.version }}.zip > ./build/export/VideoHelper-${{ github.event.inputs.version }}.zip.sha256
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: VideoHelper-${{ github.event.inputs.version }}
+        path: |
+          ./build/export/VideoHelper-${{ github.event.inputs.version }}.zip
+          ./build/export/VideoHelper-${{ github.event.inputs.version }}.zip.sha256
+        retention-days: 30
+
+    - name: Create GitHub Release
+      if: ${{ github.event.inputs.create_github_release == 'true' }}
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.event.inputs.version }}
+        name: VideoHelper v${{ github.event.inputs.version }}
+        draft: false
+        prerelease: false
+        files: |
+          ./build/export/VideoHelper-${{ github.event.inputs.version }}.zip
+          ./build/export/VideoHelper-${{ github.event.inputs.version }}.zip.sha256
+        body: |
+          # VideoHelper v${{ github.event.inputs.version }}
+
+          ## Installation
+
+          1. Download `VideoHelper-${{ github.event.inputs.version }}.zip`
+          2. Unzip the archive
+          3. Move `VideoHelper.app` to your Applications folder
+          4. Right-click and select "Open" on first launch (macOS Gatekeeper)
+
+          ## Checksums
+
+          SHA-256 checksum is provided for verification.
+
+          ## Changes
+
+          <!-- Add release notes here -->
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
