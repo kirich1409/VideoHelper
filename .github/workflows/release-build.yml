@@ -20,7 +20,9 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      run: |
+        git clone --depth=1 --branch=${{ github.head_ref || github.ref_name }} https://github.com/${{ github.repository }}.git .
+        git checkout ${{ github.sha }}
 
     - name: Select Xcode version
       uses: maxim-lobanov/setup-xcode@v1
