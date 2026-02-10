@@ -8,7 +8,7 @@ actor ValidationService {
         videoURL: URL,
         thumbnailURL: URL,
         preset: ExportPreset
-    ) async throws {
+    ) async throws(ValidationError) {
         try checkFileExists(videoURL)
         try checkFileExists(thumbnailURL)
 
@@ -31,19 +31,19 @@ actor ValidationService {
 
     // MARK: - Private Methods
 
-    private func checkFileExists(_ url: URL) throws {
+    private func checkFileExists(_ url: URL) throws(ValidationError) {
         guard FileManager.default.fileExists(atPath: url.path) else {
             throw ValidationError.fileNotFound(url.path)
         }
     }
 
-    private func checkFileReadable(_ url: URL) throws {
+    private func checkFileReadable(_ url: URL) throws(ValidationError) {
         guard FileManager.default.isReadableFile(atPath: url.path) else {
             throw ValidationError.fileNotReadable(url.path)
         }
     }
 
-    private func checkVideoFormat(_ url: URL) async throws {
+    private func checkVideoFormat(_ url: URL) async throws(ValidationError) {
         let asset = AVAsset(url: url)
 
         // Check if asset can be loaded
@@ -68,7 +68,7 @@ actor ValidationService {
         }
     }
 
-    private func checkImageFormat(_ url: URL) throws {
+    private func checkImageFormat(_ url: URL) throws(ValidationError) {
         guard let contentType = UTType(filenameExtension: url.pathExtension) else {
             throw ValidationError.unsupportedImageFormat(url.lastPathComponent)
         }
@@ -79,9 +79,14 @@ actor ValidationService {
         }
     }
 
-    private func estimateOutputSize(videoURL: URL, preset: ExportPreset) async throws -> Int64 {
+    private func estimateOutputSize(videoURL: URL, preset: ExportPreset) async throws(ValidationError) -> Int64 {
         let asset = AVAsset(url: videoURL)
-        let duration = try await asset.load(.duration)
+        let duration: CMTime
+        do {
+            duration = try await asset.load(.duration)
+        } catch {
+            throw ValidationError.corruptedFile(videoURL.lastPathComponent)
+        }
         let durationInSeconds = CMTimeGetSeconds(duration)
 
         switch preset {
@@ -117,7 +122,7 @@ actor ValidationService {
         }
     }
 
-    private func checkDiskSpace(in directory: URL, required: Int64) throws {
+    private func checkDiskSpace(in directory: URL, required: Int64) throws(ValidationError) {
         let requiredWithBuffer = Int64(Double(required) * 1.2) // 20% buffer
 
         do {
@@ -134,7 +139,7 @@ actor ValidationService {
         }
     }
 
-    private func checkWritePermissions(_ url: URL) throws {
+    private func checkWritePermissions(_ url: URL) throws(ValidationError) {
         // For sandboxed apps, when user drops a file, we automatically
         // get write access to the parent directory. Try creating a temp file.
         let testURL = url.appendingPathComponent(".videohelper_test_\(UUID().uuidString)")
@@ -147,7 +152,7 @@ actor ValidationService {
         }
     }
 
-    private func checkOutputFileNotExists(_ url: URL) throws {
+    private func checkOutputFileNotExists(_ url: URL) throws(ValidationError) {
         if FileManager.default.fileExists(atPath: url.path) {
             throw ValidationError.outputFileExists(url)
         }
