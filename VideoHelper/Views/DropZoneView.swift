@@ -1,7 +1,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
-import AppKit
-import AVFoundation
+@preconcurrency import AppKit
+@preconcurrency import AVFoundation
 
 struct DropZoneView: View {
     let title: String
@@ -123,7 +123,7 @@ struct DropZoneView: View {
 
     // MARK: - Video Thumbnail Generation
 
-    private func generateVideoThumbnail(from url: URL) async -> NSImage? {
+    private nonisolated func generateVideoThumbnail(from url: URL) async -> NSImage? {
         let asset = AVAsset(url: url)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
         imageGenerator.appliesPreferredTrackTransform = true
