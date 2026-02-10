@@ -25,6 +25,20 @@ struct VideoHelperApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     var queueViewModel: ProcessingQueueViewModel?
 
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Check if another instance is already running
+        let runningApps = NSWorkspace.shared.runningApplications
+        let videoHelperApps = runningApps.filter { app in
+            app.bundleIdentifier == Bundle.main.bundleIdentifier && app != NSRunningApplication.current
+        }
+
+        if !videoHelperApps.isEmpty {
+            // Another instance is running - activate it and quit this one
+            videoHelperApps.first?.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
+            NSApplication.shared.terminate(nil)
+        }
+    }
+
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return true
     }
