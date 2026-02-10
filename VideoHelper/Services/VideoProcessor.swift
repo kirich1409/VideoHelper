@@ -251,12 +251,15 @@ actor VideoProcessor {
         try? FileManager.default.removeItem(at: outputURL)
 
         // Determine export preset
+        // Note: Can't use Passthrough with VideoComposition (thumbnail requires encoding)
         let exportPresetName: String
         switch preset {
         case .original:
-            exportPresetName = AVAssetExportPresetPassthrough // Preserve original quality without re-encoding
-        case .telegramSD, .telegramHD:
-            exportPresetName = AVAssetExportPresetHEVC1920x1080 // HEVC for compressed formats
+            exportPresetName = AVAssetExportPresetHEVCHighestQualityWithAlpha // Highest quality with thumbnail
+        case .telegramSD:
+            exportPresetName = AVAssetExportPresetHEVC1280x720 // 720p
+        case .telegramHD:
+            exportPresetName = AVAssetExportPresetHEVC1920x1080 // 1080p
         }
 
         guard let exportSession = AVAssetExportSession(asset: composition, presetName: exportPresetName) else {
