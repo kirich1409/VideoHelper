@@ -61,6 +61,10 @@ jobs:
           CODE_SIGNING_ALLOWED=NO
       continue-on-error: true
 
+    - name: Install xcpretty
+      run: gem install xcpretty
+      continue-on-error: true
+
     - name: Check for build warnings
       run: |
         xcodebuild build \
