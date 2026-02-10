@@ -68,7 +68,8 @@ jobs:
 
     - name: Calculate checksum
       run: |
-        shasum -a 256 ./build/export/VideoHelper-${{ github.event.inputs.version }}.zip > ./build/export/VideoHelper-${{ github.event.inputs.version }}.zip.sha256
+        cd ./build/export
+        shasum -a 256 VideoHelper-${{ github.event.inputs.version }}.zip > VideoHelper-${{ github.event.inputs.version }}.zip.sha256
 
     - name: Check artifact size
       run: |
