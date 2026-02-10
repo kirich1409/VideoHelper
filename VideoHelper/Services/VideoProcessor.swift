@@ -167,15 +167,29 @@ actor VideoProcessor {
         let metadataItem = AVMutableMetadataItem()
         metadataItem.identifier = .commonIdentifierArtwork
 
-        // Determine data type based on file extension
-        let pathExtension = thumbnailURL.pathExtension.lowercased()
-        let dataType: String = switch pathExtension {
-        case "png":
-            kCMMetadataBaseDataType_PNG as String
-        case "heic", "heif":
-            "com.apple.quicktime.artwork"  // HEIC/HEIF artwork type
-        default:
-            kCMMetadataBaseDataType_JPEG as String
+        // Determine data type from actual image data using CGImageSource
+        let dataType: String
+        if let imageSource = CGImageSourceCreateWithData(thumbnailData as CFData, nil),
+           let imageType = CGImageSourceGetType(imageSource) {
+            // Map UTType to metadata data type
+            if UTType(imageType as String) == .png {
+                dataType = kCMMetadataBaseDataType_PNG as String
+            } else if UTType(imageType as String) == .heic || UTType(imageType as String) == .heif {
+                dataType = "com.apple.quicktime.artwork"
+            } else {
+                dataType = kCMMetadataBaseDataType_JPEG as String
+            }
+        } else {
+            // Fallback to file extension if image source fails
+            let pathExtension = thumbnailURL.pathExtension.lowercased()
+            dataType = switch pathExtension {
+            case "png":
+                kCMMetadataBaseDataType_PNG as String
+            case "heic", "heif":
+                "com.apple.quicktime.artwork"
+            default:
+                kCMMetadataBaseDataType_JPEG as String
+            }
         }
 
         metadataItem.dataType = dataType

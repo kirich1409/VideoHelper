@@ -24,7 +24,7 @@ struct ContentView: View {
             queueSection
         }
         .padding()
-        .frame(minWidth: 600, minHeight: 600)
+        .frame(minWidth: 600, minHeight: 650)
         .task {
             await NotificationManager.shared.requestAuthorization()
         }

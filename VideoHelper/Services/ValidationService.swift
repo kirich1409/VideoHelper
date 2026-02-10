@@ -84,6 +84,7 @@ actor ValidationService {
         do {
             duration = try await asset.load(.duration)
         } catch {
+            print("Failed to load duration for \(videoURL.lastPathComponent): \(error)")
             throw ValidationError.corruptedFile(videoURL.lastPathComponent)
         }
         let durationInSeconds = CMTimeGetSeconds(duration)
