@@ -1,11 +1,10 @@
 import XCTest
 
-@MainActor
 final class VideoHelperUITestsAutomated: XCTestCase {
 
     nonisolated(unsafe) var app: XCUIApplication!
 
-    nonisolated override func setUpWithError() throws {
+    override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launch()
@@ -14,7 +13,7 @@ final class VideoHelperUITestsAutomated: XCTestCase {
         XCTAssertTrue(app.wait(for: .runningForeground, timeout: 5))
     }
 
-    nonisolated override func tearDownWithError() throws {
+    override func tearDownWithError() throws {
         app.terminate()
         app = nil
     }
