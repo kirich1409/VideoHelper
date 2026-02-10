@@ -29,23 +29,13 @@ jobs:
 
     - name: Build project and unit tests
       run: |
-        # Build main app
+        # Build main app and unit tests only (skip UI tests)
         xcodebuild build \
           -project VideoHelper.xcodeproj \
           -target VideoHelper \
+          -target VideoHelperTests \
           -configuration Debug \
           -destination 'platform=macOS' \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO
-
-        # Build unit tests only (skip UI tests due to Swift 6 concurrency issues on CI)
-        xcodebuild build-for-testing \
-          -project VideoHelper.xcodeproj \
-          -scheme VideoHelper \
-          -configuration Debug \
-          -destination 'platform=macOS' \
-          -only-testing:VideoHelperTests \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
@@ -84,7 +74,8 @@ jobs:
       run: |
         xcodebuild build \
           -project VideoHelper.xcodeproj \
-          -scheme VideoHelper \
+          -target VideoHelper \
+          -target VideoHelperTests \
           -configuration Debug \
           -destination 'platform=macOS' \
           CODE_SIGN_IDENTITY="" \
