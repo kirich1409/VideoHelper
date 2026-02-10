@@ -29,20 +29,9 @@ jobs:
 
     - name: Build project
       run: |
-        # Build main app target only
         xcodebuild build \
           -project VideoHelper.xcodeproj \
-          -target VideoHelper \
-          -configuration Debug \
-          -destination 'platform=macOS' \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO
-
-        # Build unit tests target only (skip UI tests to avoid Swift 6 concurrency issues on CI)
-        xcodebuild build \
-          -project VideoHelper.xcodeproj \
-          -target VideoHelperTests \
+          -scheme VideoHelper \
           -configuration Debug \
           -destination 'platform=macOS' \
           CODE_SIGN_IDENTITY="" \
@@ -60,20 +49,17 @@ jobs:
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
 
-    # UI tests are disabled in CI due to Swift 6 concurrency strict checking
-    # limitations with XCTest framework on GitHub Actions. UI tests work fine
-    # locally with SWIFT_STRICT_CONCURRENCY=minimal setting.
-    # - name: Run UI tests
-    #   run: |
-    #     xcodebuild test \
-    #       -project VideoHelper.xcodeproj \
-    #       -scheme VideoHelper \
-    #       -destination 'platform=macOS' \
-    #       -only-testing:VideoHelperUITests \
-    #       CODE_SIGN_IDENTITY="" \
-    #       CODE_SIGNING_REQUIRED=NO \
-    #       CODE_SIGNING_ALLOWED=NO
-    #   continue-on-error: true
+    - name: Run UI tests
+      run: |
+        xcodebuild test \
+          -project VideoHelper.xcodeproj \
+          -scheme VideoHelper \
+          -destination 'platform=macOS' \
+          -only-testing:VideoHelperUITests \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+      continue-on-error: true
 
     - name: Install xcpretty
       run: gem install xcpretty
