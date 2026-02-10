@@ -14,9 +14,14 @@ actor VideoProcessor {
         preset: ExportPreset,
         progressHandler: @escaping (Float, TimeInterval?) -> Void
     ) async throws -> URL {
+        print("🎬 VideoProcessor.process started")
+        print("   Video: \(videoURL.path)")
+        print("   Output: \(outputURL.path)")
+
         // Start accessing security-scoped resources for sandboxed app
         let videoAccess = videoURL.startAccessingSecurityScopedResource()
         let thumbnailAccess = thumbnailURL.startAccessingSecurityScopedResource()
+        print("🔐 Security-scoped access: video=\(videoAccess), thumbnail=\(thumbnailAccess)")
 
         defer {
             if videoAccess { videoURL.stopAccessingSecurityScopedResource() }
@@ -24,24 +29,34 @@ actor VideoProcessor {
         }
 
         // 1. Load assets
+        print("📹 Loading video asset...")
         let videoAsset = AVAsset(url: videoURL)
+        print("🖼️ Loading thumbnail...")
         let thumbnailImage = try loadThumbnailImage(from: thumbnailURL)
+        print("✅ Assets loaded")
 
         // 2. Get video properties
+        print("📊 Getting frame rate...")
         let frameRate = try await getFrameRate(from: videoAsset)
+        print("✅ Frame rate: \(frameRate)")
 
         // 3. Create composition with thumbnail metadata (frame insertion pending)
+        print("🎞️ Creating composition...")
         let composition = try await createCompositionWithThumbnail(
             video: videoAsset,
             thumbnail: thumbnailImage,
             frameRate: frameRate
         )
+        print("✅ Composition created")
 
         // 4. Add metadata
+        print("📝 Adding metadata...")
         let thumbnailData = try loadThumbnailData(from: thumbnailURL)
         let metadataItem = try await addMetadata(to: composition, thumbnailData: thumbnailData)
+        print("✅ Metadata added")
 
         // 5. Export with progress tracking
+        print("💾 Starting export to: \(outputURL.path)")
         try await export(
             composition: composition,
             preset: preset,
@@ -49,6 +64,7 @@ actor VideoProcessor {
             metadataItem: metadataItem,
             progressHandler: progressHandler
         )
+        print("✅ Export completed!")
 
         return outputURL
     }

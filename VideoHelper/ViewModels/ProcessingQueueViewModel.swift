@@ -15,20 +15,27 @@ class ProcessingQueueViewModel: ObservableObject {
     // MARK: - Public Methods
 
     func addTask(video: URL, thumbnail: URL, preset: ExportPreset) async {
+        print("🔵 addTask started")
         do {
             // Validate before adding
+            print("🔵 Starting validation...")
             try await validator.validate(videoURL: video, thumbnailURL: thumbnail, preset: preset)
+            print("✅ Validation passed")
 
             // Create and add task
+            print("🔵 Creating task...")
             let task = VideoTask(videoURL: video, thumbnailURL: thumbnail, preset: preset)
             tasks.append(task)
+            print("✅ Task added to queue")
 
             // Start processing if not already running
             if !isProcessing {
+                print("🔵 Starting queue processing...")
                 await processQueue()
             }
         } catch {
             // Show error alert
+            print("❌ Error in addTask: \(error)")
             await showError(error.localizedDescription)
         }
     }
@@ -71,19 +78,27 @@ class ProcessingQueueViewModel: ObservableObject {
     // MARK: - Private Methods
 
     private func processQueue() async {
-        guard !isProcessing else { return }
+        print("🔵 processQueue started")
+        guard !isProcessing else {
+            print("⚠️ Already processing, skipping")
+            return
+        }
         isProcessing = true
 
         var successCount = 0
         let totalCount = tasks.filter { $0.status == .pending }.count
+        print("🔵 Total pending tasks: \(totalCount)")
 
         while let index = tasks.firstIndex(where: { $0.status == .pending }) {
             var task = tasks[index]
+            print("🔵 Processing task: \(task.displayName)")
             task.status = .processing
             tasks[index] = task
 
             // Ask user where to save the file
+            print("🔵 Asking for save location...")
             guard let outputURL = await askForSaveLocation(for: task) else {
+                print("⚠️ User cancelled save location")
                 // User cancelled - mark as failed
                 var failedTask = tasks[index]
                 failedTask.status = .failed
