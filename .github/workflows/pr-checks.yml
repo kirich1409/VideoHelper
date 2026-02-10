@@ -27,22 +27,11 @@ jobs:
     - name: Clean build folder
       run: xcodebuild clean -project VideoHelper.xcodeproj -scheme VideoHelper
 
-    - name: Build project (UI tests may fail due to Swift 6 concurrency - that's OK)
+    - name: Build project
       run: |
-        # Build main app and tests (UI tests have known Swift 6 issues, ignore failures)
         xcodebuild build-for-testing \
           -project VideoHelper.xcodeproj \
           -scheme VideoHelper \
-          -configuration Debug \
-          -destination 'platform=macOS' \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO || true
-
-        # Verify main app builds successfully
-        xcodebuild build \
-          -project VideoHelper.xcodeproj \
-          -target VideoHelper \
           -configuration Debug \
           -destination 'platform=macOS' \
           CODE_SIGN_IDENTITY="" \
