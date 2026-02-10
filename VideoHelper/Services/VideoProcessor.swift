@@ -7,7 +7,7 @@ actor VideoProcessor {
 
     // MARK: - Public API
 
-    nonisolated func process(
+    func process(
         videoURL: URL,
         thumbnailURL: URL,
         outputURL: URL,
@@ -51,7 +51,7 @@ actor VideoProcessor {
         // 4. Add metadata
         print("📝 Adding metadata...")
         let thumbnailData = try loadThumbnailData(from: thumbnailURL)
-        let metadataItem = try await addMetadata(to: composition, thumbnailData: thumbnailData)
+        let metadataItem = try await addMetadata(to: composition, thumbnailData: thumbnailData, thumbnailURL: thumbnailURL)
         print("✅ Metadata added")
 
         // 5. Create video composition with thumbnail
@@ -79,7 +79,7 @@ actor VideoProcessor {
 
     // MARK: - Private Methods
 
-    nonisolated private func loadThumbnailImage(from url: URL) throws -> CGImage {
+    private func loadThumbnailImage(from url: URL) throws -> CGImage {
         guard let nsImage = NSImage(contentsOf: url),
               let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             throw NSError(domain: "VideoProcessor", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to load thumbnail image"])
@@ -87,11 +87,11 @@ actor VideoProcessor {
         return cgImage
     }
 
-    nonisolated private func loadThumbnailData(from url: URL) throws -> Data {
+    private func loadThumbnailData(from url: URL) throws -> Data {
         try Data(contentsOf: url)
     }
 
-    nonisolated private func getFrameRate(from asset: AVAsset) async throws -> Float {
+    private func getFrameRate(from asset: AVAsset) async throws -> Float {
         let videoTracks = try await asset.loadTracks(withMediaType: .video)
         guard let videoTrack = videoTracks.first else {
             throw NSError(domain: "VideoProcessor", code: 2, userInfo: [NSLocalizedDescriptionKey: "No video track found"])
@@ -101,7 +101,7 @@ actor VideoProcessor {
         return nominalFrameRate > 0 ? nominalFrameRate : 30.0 // Default to 30fps if not available
     }
 
-    nonisolated private func createCompositionWithThumbnail(
+    private func createCompositionWithThumbnail(
         video: AVAsset,
         thumbnail: CGImage,
         frameRate: Float
@@ -163,16 +163,28 @@ actor VideoProcessor {
         return composition
     }
 
-    nonisolated private func addMetadata(to composition: AVMutableComposition, thumbnailData: Data) async throws -> AVMetadataItem {
+    private func addMetadata(to composition: AVMutableComposition, thumbnailData: Data, thumbnailURL: URL) async throws -> AVMetadataItem {
         let metadataItem = AVMutableMetadataItem()
         metadataItem.identifier = .commonIdentifierArtwork
-        metadataItem.dataType = kCMMetadataBaseDataType_JPEG as String
+
+        // Determine data type based on file extension
+        let pathExtension = thumbnailURL.pathExtension.lowercased()
+        let dataType: String = switch pathExtension {
+        case "png":
+            kCMMetadataBaseDataType_PNG as String
+        case "heic", "heif":
+            "com.apple.quicktime.artwork"  // HEIC/HEIF artwork type
+        default:
+            kCMMetadataBaseDataType_JPEG as String
+        }
+
+        metadataItem.dataType = dataType
         metadataItem.value = thumbnailData as NSData
 
         return metadataItem
     }
 
-    nonisolated private func createVideoComposition(
+    private func createVideoComposition(
         for composition: AVMutableComposition,
         thumbnail: CGImage,
         frameRate: Float
@@ -238,7 +250,7 @@ actor VideoProcessor {
         return videoComposition
     }
 
-    nonisolated private func export(
+    private func export(
         composition: AVMutableComposition,
         videoComposition: AVMutableVideoComposition,
         preset: ExportPreset,
@@ -290,7 +302,7 @@ actor VideoProcessor {
         return (elapsed / Double(progress)) * Double(1 - progress)
     }
 
-    nonisolated private func generateOutputURL(for videoURL: URL, preset: ExportPreset) -> URL {
+    private func generateOutputURL(for videoURL: URL, preset: ExportPreset) -> URL {
         let directory = videoURL.deletingLastPathComponent()
         let basename = videoURL.deletingPathExtension().lastPathComponent
         let filename = "\(basename)\(preset.filenameSuffix).mp4"
