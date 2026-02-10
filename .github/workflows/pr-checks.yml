@@ -29,11 +29,12 @@ jobs:
 
     - name: Build project
       run: |
-        xcodebuild build \
+        xcodebuild build-for-testing \
           -project VideoHelper.xcodeproj \
           -scheme VideoHelper \
           -configuration Debug \
           -destination 'platform=macOS' \
+          -skip-testing:VideoHelperUITests \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
