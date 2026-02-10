@@ -255,7 +255,8 @@ actor VideoProcessor {
         let exportPresetName: String
         switch preset {
         case .original:
-            exportPresetName = AVAssetExportPresetHEVCHighestQuality // Highest quality HEVC
+            // Use standard HighestQuality instead of HEVC - better progress reporting
+            exportPresetName = AVAssetExportPresetHighestQuality
         case .telegramSD:
             exportPresetName = AVAssetExportPreset1280x720 // 720p
         case .telegramHD:
