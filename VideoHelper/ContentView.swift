@@ -46,7 +46,7 @@ struct ContentView: View {
     private var dropZoneSection: some View {
         HStack(spacing: 16) {
             DropZoneView(
-                title: "Перетащите видео",
+                title: NSLocalizedString("drop_video", comment: ""),
                 icon: "video.fill",
                 acceptedTypes: [.movie, .mpeg4Movie, .quickTimeMovie],
                 selectedURL: $selectedVideo
@@ -56,7 +56,7 @@ struct ContentView: View {
             }
 
             DropZoneView(
-                title: "Перетащите картинку",
+                title: NSLocalizedString("drop_thumbnail", comment: ""),
                 icon: "photo.fill",
                 acceptedTypes: [.image],
                 selectedURL: $selectedThumbnail
@@ -70,12 +70,12 @@ struct ContentView: View {
     private var settingsSection: some View {
         VStack(spacing: 12) {
             HStack {
-                Text("Качество:")
+                Text(NSLocalizedString("quality", comment: ""))
                     .font(.headline)
 
                 Picker("", selection: $selectedPreset) {
                     ForEach(ExportPreset.allCases) { preset in
-                        Text(preset.rawValue).tag(preset)
+                        Text(preset.displayName).tag(preset)
                     }
                 }
                 .pickerStyle(.menu)
@@ -92,7 +92,7 @@ struct ContentView: View {
                 HStack {
                     Image(systemName: "doc.badge.gearshape")
                         .foregroundColor(.secondary)
-                    Text("Примерный размер: \(estimatedSize)")
+                    Text(String(format: NSLocalizedString("estimated_size", comment: ""), estimatedSize))
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -100,7 +100,7 @@ struct ContentView: View {
             }
 
             Button(action: addToQueue) {
-                Text("Добавить в очередь")
+                Text(NSLocalizedString("add_to_queue", comment: ""))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -119,7 +119,7 @@ struct ContentView: View {
     private var queueSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Очередь обработки")
+                Text(NSLocalizedString("queue_title", comment: ""))
                     .font(.headline)
 
                 Spacer()
@@ -127,7 +127,7 @@ struct ContentView: View {
                 if viewModel.isProcessing {
                     ProgressView()
                         .controlSize(.small)
-                    Text("Обработка...")
+                    Text(NSLocalizedString("processing", comment: ""))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

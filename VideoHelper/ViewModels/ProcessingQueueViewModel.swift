@@ -55,7 +55,8 @@ class ProcessingQueueViewModel: ObservableObject {
         }
 
         if !errors.isEmpty {
-            await showError("Некоторые файлы не прошли валидацию:\n" + errors.joined(separator: "\n"))
+            let errorMessage = String(format: NSLocalizedString("error.validation_failed", comment: ""), errors.joined(separator: "\n"))
+            await showError(errorMessage)
         }
 
         if !validTasks.isEmpty {
@@ -102,7 +103,7 @@ class ProcessingQueueViewModel: ObservableObject {
                 // User cancelled - mark as failed
                 var failedTask = tasks[index]
                 failedTask.status = .failed
-                failedTask.error = "Отменено пользователем"
+                failedTask.error = NSLocalizedString("error.cancelled", comment: "")
                 tasks[index] = failedTask
                 continue
             }
@@ -142,8 +143,8 @@ class ProcessingQueueViewModel: ObservableObject {
     private func askForSaveLocation(for task: VideoTask) async -> URL? {
         return await MainActor.run {
             let savePanel = NSSavePanel()
-            savePanel.title = "Сохранить обработанное видео"
-            savePanel.message = "Выберите где сохранить результат"
+            savePanel.title = NSLocalizedString("save_dialog.title", comment: "")
+            savePanel.message = NSLocalizedString("save_dialog.message", comment: "")
             savePanel.nameFieldStringValue = task.outputFileName
             savePanel.allowedContentTypes = [.mpeg4Movie]
             savePanel.canCreateDirectories = true
@@ -155,7 +156,7 @@ class ProcessingQueueViewModel: ObservableObject {
 
     private func showError(_ message: String) async {
         let alert = NSAlert()
-        alert.messageText = "Ошибка"
+        alert.messageText = NSLocalizedString("error.title", comment: "")
         alert.informativeText = message
         alert.alertStyle = .warning
         alert.addButton(withTitle: "OK")

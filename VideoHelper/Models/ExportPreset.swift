@@ -1,13 +1,23 @@
 import Foundation
 
 enum ExportPreset: String, CaseIterable, Identifiable {
-    case uhd4K = "4K (2160p)"
-    case fullHD = "Full HD (1080p)"
-    case telegramHD = "Telegram HD (1080p)"
-    case hd = "HD (720p)"
-    case telegramSD = "Telegram SD (720p)"
+    case uhd4K
+    case fullHD
+    case telegramHD
+    case hd
+    case telegramSD
 
     var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .uhd4K: return NSLocalizedString("preset.4k", comment: "")
+        case .fullHD: return NSLocalizedString("preset.fullhd", comment: "")
+        case .telegramHD: return NSLocalizedString("preset.telegram_hd", comment: "")
+        case .hd: return NSLocalizedString("preset.hd", comment: "")
+        case .telegramSD: return NSLocalizedString("preset.telegram_sd", comment: "")
+        }
+    }
 
     var filenameSuffix: String {
         switch self {

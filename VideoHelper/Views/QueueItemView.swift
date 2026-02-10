@@ -75,7 +75,7 @@ struct QueueItemView: View {
                     .foregroundColor(.red)
             }
             .buttonStyle(.plain)
-            .help("Удалить из очереди")
+            .help(NSLocalizedString("remove_from_queue", comment: ""))
 
         case .completed:
             Button(action: onShowInFinder) {
@@ -83,7 +83,7 @@ struct QueueItemView: View {
                     .foregroundColor(.blue)
             }
             .buttonStyle(.plain)
-            .help("Показать в Finder")
+            .help(NSLocalizedString("show_in_finder", comment: ""))
 
         case .processing:
             ProgressView()

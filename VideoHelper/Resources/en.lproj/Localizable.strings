@@ -1,0 +1,41 @@
+/* Quality Presets */
+"preset.4k" = "4K (2160p)";
+"preset.fullhd" = "Full HD (1080p)";
+"preset.telegram_hd" = "Telegram HD (1080p)";
+"preset.hd" = "HD (720p)";
+"preset.telegram_sd" = "Telegram SD (720p)";
+
+/* UI Labels */
+"quality" = "Quality:";
+"add_to_queue" = "Add to Queue";
+"queue_title" = "Processing Queue";
+"processing" = "Processing...";
+"estimated_size" = "Estimated size: %@";
+
+/* Drop Zones */
+"drop_video" = "Drop video";
+"drop_thumbnail" = "Drop thumbnail";
+
+/* Status */
+"status.pending" = "Pending";
+"status.processing" = "Processing";
+"status.completed" = "Completed";
+"status.failed" = "Failed";
+
+/* Buttons */
+"show_in_finder" = "Show in Finder";
+"remove_from_queue" = "Remove from queue";
+
+/* Dialogs */
+"save_dialog.title" = "Save processed video";
+"save_dialog.message" = "Choose where to save the result";
+"terminate.title" = "Video processing in progress";
+"terminate.message" = "Are you sure you want to quit? Unfinished tasks will be cancelled.";
+"terminate.cancel" = "Cancel";
+"terminate.quit" = "Quit";
+
+/* Errors */
+"error.title" = "Error";
+"error.validation_failed" = "Some files failed validation:\n%@";
+"error.cancelled" = "Cancelled by user";
+"error.export_failed" = "Export failed";

@@ -48,10 +48,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if viewModel.hasActiveTasks {
             let alert = NSAlert()
-            alert.messageText = "Обработка видео в процессе"
-            alert.informativeText = "Вы уверены что хотите выйти? Незавершенные задачи будут отменены."
-            alert.addButton(withTitle: "Отмена")
-            alert.addButton(withTitle: "Выйти")
+            alert.messageText = NSLocalizedString("terminate.title", comment: "")
+            alert.informativeText = NSLocalizedString("terminate.message", comment: "")
+            alert.addButton(withTitle: NSLocalizedString("terminate.cancel", comment: ""))
+            alert.addButton(withTitle: NSLocalizedString("terminate.quit", comment: ""))
             alert.alertStyle = .warning
 
             let response = alert.runModal()

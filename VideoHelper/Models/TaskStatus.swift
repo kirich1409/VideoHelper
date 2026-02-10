@@ -8,10 +8,10 @@ enum TaskStatus: Equatable {
 
     var displayText: String {
         switch self {
-        case .pending: return "Ожидает"
-        case .processing: return "Обрабатывается"
-        case .completed: return "Завершено"
-        case .failed: return "Ошибка"
+        case .pending: return NSLocalizedString("status.pending", comment: "")
+        case .processing: return NSLocalizedString("status.processing", comment: "")
+        case .completed: return NSLocalizedString("status.completed", comment: "")
+        case .failed: return NSLocalizedString("status.failed", comment: "")
         }
     }
 

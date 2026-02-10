@@ -1,0 +1,41 @@
+/* Quality Presets */
+"preset.4k" = "4K (2160p)";
+"preset.fullhd" = "Full HD (1080p)";
+"preset.telegram_hd" = "Telegram HD (1080p)";
+"preset.hd" = "HD (720p)";
+"preset.telegram_sd" = "Telegram SD (720p)";
+
+/* UI Labels */
+"quality" = "Качество:";
+"add_to_queue" = "Добавить в очередь";
+"queue_title" = "Очередь обработки";
+"processing" = "Обработка...";
+"estimated_size" = "Примерный размер: %@";
+
+/* Drop Zones */
+"drop_video" = "Перетащите видео";
+"drop_thumbnail" = "Перетащите картинку";
+
+/* Status */
+"status.pending" = "Ожидает";
+"status.processing" = "Обрабатывается";
+"status.completed" = "Готово";
+"status.failed" = "Ошибка";
+
+/* Buttons */
+"show_in_finder" = "Показать в Finder";
+"remove_from_queue" = "Удалить из очереди";
+
+/* Dialogs */
+"save_dialog.title" = "Сохранить обработанное видео";
+"save_dialog.message" = "Выберите где сохранить результат";
+"terminate.title" = "Обработка видео в процессе";
+"terminate.message" = "Вы уверены что хотите выйти? Незавершенные задачи будут отменены.";
+"terminate.cancel" = "Отмена";
+"terminate.quit" = "Выйти";
+
+/* Errors */
+"error.title" = "Ошибка";
+"error.validation_failed" = "Некоторые файлы не прошли валидацию:\n%@";
+"error.cancelled" = "Отменено пользователем";
+"error.export_failed" = "Ошибка экспорта";
