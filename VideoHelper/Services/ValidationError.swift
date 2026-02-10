@@ -23,7 +23,9 @@ enum ValidationError: LocalizedError {
         case .corruptedFile(let path):
             return "Файл поврежден: \(path)"
         case .insufficientDiskSpace(let required, let available):
-            return "Недостаточно места на диске. Требуется: \(ByteCountFormatter.string(fromByteCount: required, countStyle: .file)), доступно: \(ByteCountFormatter.string(fromByteCount: available, countStyle: .file))"
+            let requiredStr = ByteCountFormatter.string(fromByteCount: required, countStyle: .file)
+            let availableStr = ByteCountFormatter.string(fromByteCount: available, countStyle: .file)
+            return "Недостаточно места на диске. Требуется: \(requiredStr), доступно: \(availableStr)"
         case .noWritePermission(let url):
             return "Нет прав на запись в папку: \(url.path)"
         case .outputFileExists(let url):
