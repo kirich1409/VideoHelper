@@ -23,13 +23,11 @@ final class VideoHelperUITestsAutomated: XCTestCase {
 
     // MARK: - UI Element Tests
 
-    @MainActor
     func testAppLaunches() throws {
         // Verify app launched successfully
         XCTAssertTrue(app.exists)
     }
 
-    @MainActor
     func testDropZonesExist() throws {
         // Check for drop zone texts
         let videoDropZone = app.staticTexts["Перетащите видео"]
@@ -39,7 +37,6 @@ final class VideoHelperUITestsAutomated: XCTestCase {
         XCTAssertTrue(imageDropZone.exists, "Image drop zone should exist")
     }
 
-    @MainActor
     func testQualityPickerExists() throws {
         // Check for quality label and picker
         let qualityLabel = app.staticTexts["Качество:"]
@@ -50,7 +47,6 @@ final class VideoHelperUITestsAutomated: XCTestCase {
         XCTAssertTrue(picker.exists, "Quality picker should exist")
     }
 
-    @MainActor
     func testQualityPickerOptions() throws {
         // Click on quality picker
         let picker = app.popUpButtons.firstMatch
@@ -78,26 +74,22 @@ final class VideoHelperUITestsAutomated: XCTestCase {
         XCTAssertNotEqual(picker.title, initialTitle, "Picker value should have changed")
     }
 
-    @MainActor
     func testAddToQueueButtonExists() throws {
         let addButton = app.buttons["Добавить в очередь"]
         XCTAssertTrue(addButton.exists, "Add to queue button should exist")
     }
 
-    @MainActor
     func testAddToQueueButtonInitiallyDisabled() throws {
         let addButton = app.buttons["Добавить в очередь"]
         XCTAssertTrue(addButton.exists)
         XCTAssertFalse(addButton.isEnabled, "Add button should be disabled initially")
     }
 
-    @MainActor
     func testQueueHeaderExists() throws {
         let queueHeader = app.staticTexts["Очередь обработки"]
         XCTAssertTrue(queueHeader.exists, "Queue header should exist")
     }
 
-    @MainActor
     func testEmptyQueueMessage() throws {
         let emptyMessage = app.staticTexts["Очередь пуста"]
         XCTAssertTrue(emptyMessage.exists, "Empty queue message should exist")
@@ -105,7 +97,6 @@ final class VideoHelperUITestsAutomated: XCTestCase {
 
     // MARK: - Accessibility Tests
 
-    @MainActor
     func testDropZonesAccessibility() throws {
         // Check that drop zones have proper accessibility
         let videoIcon = app.images.matching(identifier: "video.fill").firstMatch
@@ -119,7 +110,6 @@ final class VideoHelperUITestsAutomated: XCTestCase {
 
     // MARK: - Layout Tests
 
-    @MainActor
     func testMainLayoutStructure() throws {
         // Verify main sections exist in order
         let videoDropText = app.staticTexts["Перетащите видео"]
@@ -141,7 +131,6 @@ final class VideoHelperUITestsAutomated: XCTestCase {
         XCTAssertLessThan(qualityFrame.midY, queueFrame.midY, "Quality picker should be above queue")
     }
 
-    @MainActor
     func testWindowSize() throws {
         // Verify window has minimum size
         let window = app.windows.firstMatch
@@ -154,7 +143,6 @@ final class VideoHelperUITestsAutomated: XCTestCase {
 
     // MARK: - Performance Tests
 
-    @MainActor
     func testLaunchPerformance() throws {
         measure(metrics: [XCTApplicationLaunchMetric()]) {
             XCUIApplication().launch()
@@ -163,7 +151,6 @@ final class VideoHelperUITestsAutomated: XCTestCase {
 
     // MARK: - Screenshot Tests
 
-    @MainActor
     func testTakeScreenshotOfInitialState() throws {
         // Take screenshot of initial empty state
         let screenshot = app.screenshot()
@@ -173,7 +160,6 @@ final class VideoHelperUITestsAutomated: XCTestCase {
         add(attachment)
     }
 
-    @MainActor
     func testTakeScreenshotOfQualityPicker() throws {
         let picker = app.popUpButtons.firstMatch
         picker.click()
