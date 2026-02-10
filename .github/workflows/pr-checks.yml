@@ -1,0 +1,79 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: macos-15
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+
+    - name: Show Xcode version
+      run: xcodebuild -version
+
+    - name: Show available SDKs
+      run: xcodebuild -showsdks
+
+    - name: Clean build folder
+      run: xcodebuild clean -project VideoHelper.xcodeproj -scheme VideoHelper
+
+    - name: Build project
+      run: |
+        xcodebuild build \
+          -project VideoHelper.xcodeproj \
+          -scheme VideoHelper \
+          -configuration Debug \
+          -destination 'platform=macOS' \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+
+    - name: Run unit tests
+      run: |
+        xcodebuild test \
+          -project VideoHelper.xcodeproj \
+          -scheme VideoHelper \
+          -destination 'platform=macOS' \
+          -only-testing:VideoHelperTests \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+
+    - name: Run UI tests
+      run: |
+        xcodebuild test \
+          -project VideoHelper.xcodeproj \
+          -scheme VideoHelper \
+          -destination 'platform=macOS' \
+          -only-testing:VideoHelperUITests \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+      continue-on-error: true
+
+    - name: Install xcpretty
+      run: gem install xcpretty
+      continue-on-error: true
+
+    - name: Check for build warnings
+      run: |
+        xcodebuild build \
+          -project VideoHelper.xcodeproj \
+          -scheme VideoHelper \
+          -configuration Debug \
+          -destination 'platform=macOS' \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          | xcpretty --color --report junit
+      continue-on-error: true

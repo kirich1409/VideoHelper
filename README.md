@@ -4,10 +4,20 @@ A native macOS application for adding custom thumbnails to videos with one click
 
 Нативное macOS приложение для добавления пользовательских миниатюр к видео в один клик.
 
-![macOS](https://img.shields.io/badge/macOS-26.0+-blue)
+![macOS](https://img.shields.io/badge/macOS-14.0+-blue)
 ![Swift](https://img.shields.io/badge/Swift-5.9-orange)
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-4.0-green)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
+[![PR Checks](https://github.com/kirich1409/VideoHelper/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/kirich1409/VideoHelper/actions/workflows/pr-checks.yml)
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and release builds.
+
+- **PR Checks**: Automatically validates all pull requests (build + tests)
+- **Release Builds**: On-demand release builds via workflow dispatch
+
+See [.github/workflows/README.md](.github/workflows/README.md) for details.
 
 ## Features / Возможности
 

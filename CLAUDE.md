@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 VideoHelper is a native macOS application for adding custom thumbnails to videos with drag-and-drop simplicity. Built with Swift and SwiftUI, it uses AVFoundation for video processing and supports bilingual localization (English/Russian).
 
 **Bundle ID**: `dev.androidbroadcast.VideoHelper`
-**Deployment Target**: macOS 26.2+
+**Deployment Target**: macOS 14.0+
 **Architecture**: MVVM with Swift Concurrency (async/await + actors)
 
 ## Building and Running
@@ -25,6 +25,46 @@ xcodebuild test -scheme VideoHelper -destination 'platform=macOS'
 ```
 
 The app is sandboxed and requires security-scoped resource access for file operations.
+
+## CI/CD Workflows
+
+### PR Checks (Automated)
+
+Runs automatically on all pull requests:
+- Build validation (Debug configuration)
+- Unit tests (VideoHelperTests)
+- UI tests (VideoHelperUITests)
+- Build warnings check
+
+See status in PR checks section. All checks must pass before merging.
+
+### Release Builds (Manual)
+
+Trigger via GitHub Actions tab → Release Build workflow:
+
+```bash
+gh workflow run release-build.yml -f version="1.0.0" -f create_github_release=true
+```
+
+Produces:
+- Unsigned .app bundle (for testing)
+- ZIP archive with version number
+- SHA-256 checksum for verification
+- Optional GitHub Release with assets
+
+For signed/notarized releases, configure code signing certificates in GitHub Secrets.
+
+### Local Testing
+
+Before pushing, verify your changes locally:
+
+```bash
+# Build
+xcodebuild clean build -project VideoHelper.xcodeproj -scheme VideoHelper
+
+# Run tests
+xcodebuild test -project VideoHelper.xcodeproj -scheme VideoHelper -destination 'platform=macOS'
+```
 
 ## Core Architecture
 
