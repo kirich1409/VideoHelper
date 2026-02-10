@@ -47,3 +47,6 @@ Carthage/Build/
 
 # Logs
 *.log
+
+# Git worktrees
+.worktrees/
