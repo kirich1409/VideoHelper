@@ -7,7 +7,7 @@ actor VideoProcessor {
 
     // MARK: - Public API
 
-    func process(
+    nonisolated func process(
         videoURL: URL,
         thumbnailURL: URL,
         outputURL: URL,
@@ -79,7 +79,7 @@ actor VideoProcessor {
 
     // MARK: - Private Methods
 
-    private func loadThumbnailImage(from url: URL) throws -> CGImage {
+    nonisolated private func loadThumbnailImage(from url: URL) throws -> CGImage {
         guard let nsImage = NSImage(contentsOf: url),
               let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             throw NSError(domain: "VideoProcessor", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to load thumbnail image"])
@@ -87,11 +87,11 @@ actor VideoProcessor {
         return cgImage
     }
 
-    private func loadThumbnailData(from url: URL) throws -> Data {
+    nonisolated private func loadThumbnailData(from url: URL) throws -> Data {
         try Data(contentsOf: url)
     }
 
-    private func getFrameRate(from asset: AVAsset) async throws -> Float {
+    nonisolated private func getFrameRate(from asset: AVAsset) async throws -> Float {
         let videoTracks = try await asset.loadTracks(withMediaType: .video)
         guard let videoTrack = videoTracks.first else {
             throw NSError(domain: "VideoProcessor", code: 2, userInfo: [NSLocalizedDescriptionKey: "No video track found"])
@@ -101,7 +101,7 @@ actor VideoProcessor {
         return nominalFrameRate > 0 ? nominalFrameRate : 30.0 // Default to 30fps if not available
     }
 
-    private func createCompositionWithThumbnail(
+    nonisolated private func createCompositionWithThumbnail(
         video: AVAsset,
         thumbnail: CGImage,
         frameRate: Float
@@ -163,7 +163,7 @@ actor VideoProcessor {
         return composition
     }
 
-    private func addMetadata(to composition: AVMutableComposition, thumbnailData: Data, thumbnailURL: URL) async throws -> AVMetadataItem {
+    nonisolated private func addMetadata(to composition: AVMutableComposition, thumbnailData: Data, thumbnailURL: URL) async throws -> AVMetadataItem {
         let metadataItem = AVMutableMetadataItem()
         metadataItem.identifier = .commonIdentifierArtwork
 
@@ -184,7 +184,7 @@ actor VideoProcessor {
         return metadataItem
     }
 
-    private func createVideoComposition(
+    nonisolated private func createVideoComposition(
         for composition: AVMutableComposition,
         thumbnail: CGImage,
         frameRate: Float
@@ -250,7 +250,7 @@ actor VideoProcessor {
         return videoComposition
     }
 
-    private func export(
+    nonisolated private func export(
         composition: AVMutableComposition,
         videoComposition: AVMutableVideoComposition,
         preset: ExportPreset,
@@ -302,7 +302,7 @@ actor VideoProcessor {
         return (elapsed / Double(progress)) * Double(1 - progress)
     }
 
-    private func generateOutputURL(for videoURL: URL, preset: ExportPreset) -> URL {
+    nonisolated private func generateOutputURL(for videoURL: URL, preset: ExportPreset) -> URL {
         let directory = videoURL.deletingLastPathComponent()
         let basename = videoURL.deletingPathExtension().lastPathComponent
         let filename = "\(basename)\(preset.filenameSuffix).mp4"
