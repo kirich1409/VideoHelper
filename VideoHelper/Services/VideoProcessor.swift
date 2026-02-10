@@ -276,35 +276,38 @@ actor VideoProcessor {
         let startTime = Date()
 
         // Start export task
-        let exportTask = Task {
-            await exportSession.export()
-        }
-
-        // Poll progress
-        while !exportTask.isCancelled && (exportSession.status == .waiting || exportSession.status == .exporting) {
-            let progress = exportSession.progress
-            let elapsed = Date().timeIntervalSince(startTime)
-            let estimatedRemaining = calculateRemainingTime(progress: progress, elapsed: elapsed)
-
-            print("📊 Progress: \(progress), Remaining: \(estimatedRemaining ?? 0)s, Status: \(exportSession.status.rawValue)")
-
-            // Fire-and-forget update to avoid deadlock
-            Task { @MainActor in
-                progressHandler(progress, estimatedRemaining)
+        await withTaskGroup(of: Void.self) { group in
+            // Export task
+            group.addTask {
+                await exportSession.export()
             }
 
-            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
+            // Progress monitoring task
+            group.addTask {
+                while exportSession.status == .waiting || exportSession.status == .exporting {
+                    let progress = exportSession.progress
+                    let elapsed = Date().timeIntervalSince(startTime)
+                    let estimatedRemaining = self.calculateRemainingTime(progress: progress, elapsed: elapsed)
+
+                    // Update progress on main actor (non-blocking)
+                    Task { @MainActor in
+                        progressHandler(progress, estimatedRemaining)
+                    }
+
+                    try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
+                }
+            }
         }
 
-        // Wait for export to complete
-        await exportTask.value
+        // Final progress update
+        Task { @MainActor in
+            progressHandler(1.0, 0)
+        }
 
         // Check result
         switch exportSession.status {
         case .completed:
-            Task { @MainActor in
-                progressHandler(1.0, 0)
-            }
+            break
         case .failed:
             throw exportSession.error ?? NSError(domain: "VideoProcessor", code: 7, userInfo: [NSLocalizedDescriptionKey: "Export failed"])
         case .cancelled:
