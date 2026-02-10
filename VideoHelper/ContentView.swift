@@ -49,7 +49,8 @@ struct ContentView: View {
                 title: NSLocalizedString("drop_video", comment: ""),
                 icon: "video.fill",
                 acceptedTypes: [.movie, .mpeg4Movie, .quickTimeMovie],
-                selectedURL: $selectedVideo
+                selectedURL: $selectedVideo,
+                accentColor: .blue
             )
             .onChange(of: selectedVideo) { _, _ in
                 updateEstimatedSize()
@@ -59,7 +60,8 @@ struct ContentView: View {
                 title: NSLocalizedString("drop_thumbnail", comment: ""),
                 icon: "photo.fill",
                 acceptedTypes: [.image],
-                selectedURL: $selectedThumbnail
+                selectedURL: $selectedThumbnail,
+                accentColor: .purple
             )
         }
         .frame(height: 160)

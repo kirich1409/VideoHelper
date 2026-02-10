@@ -8,6 +8,7 @@ struct DropZoneView: View {
     let icon: String
     let acceptedTypes: [UTType]
     @Binding var selectedURL: URL?
+    var accentColor: Color = .blue
 
     @State private var isTargeted = false
     @State private var videoThumbnail: NSImage?
@@ -54,11 +55,11 @@ struct DropZoneView: View {
                 VStack(spacing: 8) {
                     Image(systemName: icon)
                         .font(.system(size: 48))
-                        .foregroundColor(isTargeted ? .accentColor : .secondary)
+                        .foregroundColor(isTargeted ? accentColor : accentColor.opacity(0.6))
 
                     Text(title)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(.headline)
+                        .foregroundColor(isTargeted ? accentColor : .primary)
                 }
             }
         }
@@ -68,12 +69,12 @@ struct DropZoneView: View {
         .accessibilityIdentifier("dropZone_\(title)")
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(isTargeted ? Color.accentColor.opacity(0.1) : Color.gray.opacity(0.1))
+                .fill(isTargeted ? accentColor.opacity(0.15) : accentColor.opacity(0.05))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(
-                    isTargeted ? Color.accentColor : Color.gray.opacity(0.3),
+                    isTargeted ? accentColor : accentColor.opacity(0.4),
                     style: StrokeStyle(lineWidth: 2, dash: [8, 4])
                 )
         )
