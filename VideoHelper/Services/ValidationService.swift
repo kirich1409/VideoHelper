@@ -85,21 +85,21 @@ actor ValidationService {
         let durationInSeconds = CMTimeGetSeconds(duration)
 
         switch preset {
+        case .uhd4K:
+            // 4K: 20 Mbps video + 256 kbps audio
+            let videoBitrate: Int64 = 20_000_000
+            let audioBitrate: Int64 = 256_000
+            return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
+
         case .fullHD:
-            // Full HD: 4 Mbps video + 128 kbps audio
-            let videoBitrate: Int64 = 4_000_000
-            let audioBitrate: Int64 = 128_000
+            // Full HD: 8 Mbps video + 192 kbps audio
+            let videoBitrate: Int64 = 8_000_000
+            let audioBitrate: Int64 = 192_000
             return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
 
         case .hd:
-            // HD: 2 Mbps video + 128 kbps audio
-            let videoBitrate: Int64 = 2_000_000
-            let audioBitrate: Int64 = 128_000
-            return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
-
-        case .sd:
-            // SD: 1 Mbps video + 128 kbps audio
-            let videoBitrate: Int64 = 1_000_000
+            // HD: 4 Mbps video + 128 kbps audio
+            let videoBitrate: Int64 = 4_000_000
             let audioBitrate: Int64 = 128_000
             return Int64(durationInSeconds * Double(videoBitrate + audioBitrate) / 8.0)
         }

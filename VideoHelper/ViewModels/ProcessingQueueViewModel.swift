@@ -112,28 +112,13 @@ class ProcessingQueueViewModel: ObservableObject {
                     videoURL: task.videoURL,
                     thumbnailURL: task.thumbnailURL,
                     outputURL: outputURL,
-                    preset: task.preset,
-                    progressHandler: { [weak self] progress, timeRemaining in
-                        guard let self = self else { return }
-                        print("🔄 Progress handler called: progress=\(progress), time=\(timeRemaining ?? 0)")
-                        if let taskIndex = self.tasks.firstIndex(where: { $0.id == task.id }) {
-                            var updatedTask = self.tasks[taskIndex]
-                            updatedTask.progress = progress
-                            updatedTask.estimatedTimeRemaining = timeRemaining
-                            self.tasks[taskIndex] = updatedTask
-                            print("✅ Task updated at index \(taskIndex)")
-                        } else {
-                            print("⚠️ Could not find task with id \(task.id)")
-                        }
-                    }
+                    preset: task.preset
                 )
 
                 // Success
                 var completedTask = tasks[index]
                 completedTask.status = .completed
                 completedTask.outputURL = finalURL
-                completedTask.progress = 1.0
-                completedTask.estimatedTimeRemaining = nil
                 tasks[index] = completedTask
                 successCount += 1
 

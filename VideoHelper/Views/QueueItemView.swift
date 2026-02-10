@@ -33,20 +33,9 @@ struct QueueItemView: View {
 
                 HStack(spacing: 4) {
                     Text(task.status.emoji)
-                    Text(statusText)
+                    Text(task.status.displayText)
                         .font(.subheadline)
                         .foregroundColor(statusColor)
-                }
-
-                if task.status == .processing {
-                    ProgressView(value: Double(task.progress))
-                        .progressViewStyle(.linear)
-
-                    if let timeRemaining = task.estimatedTimeRemaining {
-                        Text(timeRemaining.formattedEstimate)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
                 }
 
                 if task.status == .failed, let error = task.error {
@@ -65,17 +54,6 @@ struct QueueItemView: View {
         .padding(8)
         .task {
             await loadThumbnail()
-        }
-    }
-
-    private var statusText: String {
-        switch task.status {
-        case .pending:
-            return task.status.displayText
-        case .processing:
-            return "\(task.status.displayText) \(Int(task.progress * 100))%"
-        case .completed, .failed:
-            return task.status.displayText
         }
     }
 

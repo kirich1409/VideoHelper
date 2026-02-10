@@ -11,8 +11,7 @@ actor VideoProcessor {
         videoURL: URL,
         thumbnailURL: URL,
         outputURL: URL,
-        preset: ExportPreset,
-        progressHandler: @escaping (Float, TimeInterval?) -> Void
+        preset: ExportPreset
     ) async throws -> URL {
         print("🎬 VideoProcessor.process started")
         print("   Video: \(videoURL.path)")
@@ -64,15 +63,14 @@ actor VideoProcessor {
         )
         print("✅ Video composition created")
 
-        // 6. Export with progress tracking
+        // 6. Export
         print("💾 Starting export to: \(outputURL.path)")
         try await export(
             composition: composition,
             videoComposition: videoComposition,
             preset: preset,
             outputURL: outputURL,
-            metadataItem: metadataItem,
-            progressHandler: progressHandler
+            metadataItem: metadataItem
         )
         print("✅ Export completed!")
 
@@ -244,8 +242,7 @@ actor VideoProcessor {
         videoComposition: AVMutableVideoComposition,
         preset: ExportPreset,
         outputURL: URL,
-        metadataItem: AVMetadataItem,
-        progressHandler: @escaping (Float, TimeInterval?) -> Void
+        metadataItem: AVMetadataItem
     ) async throws {
         // Remove existing file if present
         try? FileManager.default.removeItem(at: outputURL)
@@ -253,12 +250,12 @@ actor VideoProcessor {
         // Determine export preset
         let exportPresetName: String
         switch preset {
+        case .uhd4K:
+            exportPresetName = AVAssetExportPreset3840x2160 // 4K
         case .fullHD:
             exportPresetName = AVAssetExportPreset1920x1080 // 1080p
         case .hd:
             exportPresetName = AVAssetExportPreset1280x720 // 720p
-        case .sd:
-            exportPresetName = AVAssetExportPreset960x540 // 540p
         }
 
         guard let exportSession = AVAssetExportSession(asset: composition, presetName: exportPresetName) else {
@@ -271,37 +268,8 @@ actor VideoProcessor {
         exportSession.metadata = [metadataItem]
         exportSession.videoComposition = videoComposition
 
-        // Track progress with async polling
-        let startTime = Date()
-
-        // Start export task
-        await withTaskGroup(of: Void.self) { group in
-            // Export task
-            group.addTask {
-                await exportSession.export()
-            }
-
-            // Progress monitoring task
-            group.addTask {
-                while exportSession.status == .waiting || exportSession.status == .exporting {
-                    let progress = exportSession.progress
-                    let elapsed = Date().timeIntervalSince(startTime)
-                    let estimatedRemaining = self.calculateRemainingTime(progress: progress, elapsed: elapsed)
-
-                    // Update progress on main actor (non-blocking)
-                    Task { @MainActor in
-                        progressHandler(progress, estimatedRemaining)
-                    }
-
-                    try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
-                }
-            }
-        }
-
-        // Final progress update
-        Task { @MainActor in
-            progressHandler(1.0, 0)
-        }
+        // Simple export without progress tracking
+        await exportSession.export()
 
         // Check result
         switch exportSession.status {
