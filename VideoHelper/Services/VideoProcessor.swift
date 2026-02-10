@@ -55,10 +55,20 @@ actor VideoProcessor {
         let metadataItem = try await addMetadata(to: composition, thumbnailData: thumbnailData)
         print("✅ Metadata added")
 
-        // 5. Export with progress tracking
+        // 5. Create video composition with thumbnail
+        print("🎨 Creating video composition with thumbnail...")
+        let videoComposition = try await createVideoComposition(
+            for: composition,
+            thumbnail: thumbnailImage,
+            frameRate: frameRate
+        )
+        print("✅ Video composition created")
+
+        // 6. Export with progress tracking
         print("💾 Starting export to: \(outputURL.path)")
         try await export(
             composition: composition,
+            videoComposition: videoComposition,
             preset: preset,
             outputURL: outputURL,
             metadataItem: metadataItem,
@@ -163,8 +173,75 @@ actor VideoProcessor {
         return metadataItem
     }
 
+    private func createVideoComposition(
+        for composition: AVMutableComposition,
+        thumbnail: CGImage,
+        frameRate: Float
+    ) async throws -> AVMutableVideoComposition {
+        let frameDuration = CMTime(value: 1, timescale: CMTimeScale(frameRate))
+
+        // Get video track
+        guard let videoTrack = composition.tracks(withMediaType: .video).first else {
+            throw NSError(domain: "VideoProcessor", code: 10, userInfo: [NSLocalizedDescriptionKey: "No video track in composition"])
+        }
+
+        let naturalSize = try await videoTrack.load(.naturalSize)
+
+        // Create video composition
+        let videoComposition = AVMutableVideoComposition()
+        videoComposition.frameDuration = frameDuration
+        videoComposition.renderSize = naturalSize
+
+        // Create layer for thumbnail (first frame)
+        let thumbnailLayer = CALayer()
+        thumbnailLayer.contents = thumbnail
+        thumbnailLayer.frame = CGRect(origin: .zero, size: naturalSize)
+        thumbnailLayer.contentsGravity = .resizeAspect
+
+        // Create parent layer
+        let parentLayer = CALayer()
+        parentLayer.frame = CGRect(origin: .zero, size: naturalSize)
+
+        // Create video layer
+        let videoLayer = CALayer()
+        videoLayer.frame = CGRect(origin: .zero, size: naturalSize)
+
+        // Add layers: thumbnail first (at t=0), then video
+        parentLayer.addSublayer(videoLayer)
+
+        // Animation to show thumbnail only for first frame
+        let thumbnailAnimation = CABasicAnimation(keyPath: "opacity")
+        thumbnailAnimation.fromValue = 1.0
+        thumbnailAnimation.toValue = 0.0
+        thumbnailAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
+        thumbnailAnimation.duration = CMTimeGetSeconds(frameDuration)
+        thumbnailAnimation.fillMode = .forwards
+        thumbnailAnimation.isRemovedOnCompletion = false
+        thumbnailLayer.add(thumbnailAnimation, forKey: "opacity")
+
+        parentLayer.insertSublayer(thumbnailLayer, above: videoLayer)
+
+        // Set up animation tool
+        videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
+            postProcessingAsVideoLayer: videoLayer,
+            in: parentLayer
+        )
+
+        // Create instruction for entire duration
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = CMTimeRange(start: .zero, duration: composition.duration)
+
+        let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
+        instruction.layerInstructions = [layerInstruction]
+
+        videoComposition.instructions = [instruction]
+
+        return videoComposition
+    }
+
     private func export(
         composition: AVMutableComposition,
+        videoComposition: AVMutableVideoComposition,
         preset: ExportPreset,
         outputURL: URL,
         metadataItem: AVMetadataItem,
@@ -190,6 +267,7 @@ actor VideoProcessor {
         exportSession.outputFileType = .mp4
         exportSession.shouldOptimizeForNetworkUse = true // Fast start for streaming
         exportSession.metadata = [metadataItem]
+        exportSession.videoComposition = videoComposition
 
         // Track progress
         let startTime = Date()
