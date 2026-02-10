@@ -1,6 +1,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 import AppKit
+import AVFoundation
 
 struct DropZoneView: View {
     let title: String
@@ -9,6 +10,7 @@ struct DropZoneView: View {
     @Binding var selectedURL: URL?
 
     @State private var isTargeted = false
+    @State private var videoThumbnail: NSImage?
 
     var body: some View {
         VStack(spacing: 12) {
@@ -17,6 +19,12 @@ struct DropZoneView: View {
                 VStack(spacing: 8) {
                     if acceptedTypes.contains(.image), let nsImage = NSImage(contentsOf: url) {
                         Image(nsImage: nsImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: 120, maxHeight: 80)
+                            .cornerRadius(8)
+                    } else if acceptedTypes.contains(.movie), let thumbnail = videoThumbnail {
+                        Image(nsImage: thumbnail)
                             .resizable()
                             .scaledToFit()
                             .frame(maxWidth: 120, maxHeight: 80)
@@ -34,6 +42,7 @@ struct DropZoneView: View {
 
                     Button(action: {
                         selectedURL = nil
+                        videoThumbnail = nil
                     }) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundColor(.secondary)
@@ -85,9 +94,22 @@ struct DropZoneView: View {
 
                 if let url = url {
                     print("✅ Got URL: \(url.path)")
-                    DispatchQueue.main.async {
-                        self.selectedURL = url
-                        print("✅ URL set in state")
+
+                    // Generate video thumbnail if it's a video file
+                    if self.acceptedTypes.contains(.movie) {
+                        Task {
+                            let thumbnail = await self.generateVideoThumbnail(from: url)
+                            await MainActor.run {
+                                self.selectedURL = url
+                                self.videoThumbnail = thumbnail
+                                print("✅ URL and thumbnail set in state")
+                            }
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.selectedURL = url
+                            print("✅ URL set in state")
+                        }
                     }
                 } else {
                     print("❌ URL is nil")
@@ -95,6 +117,23 @@ struct DropZoneView: View {
             }
 
             return true
+        }
+    }
+
+    // MARK: - Video Thumbnail Generation
+
+    private func generateVideoThumbnail(from url: URL) async -> NSImage? {
+        let asset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.appliesPreferredTrackTransform = true
+        imageGenerator.maximumSize = CGSize(width: 240, height: 180)
+
+        do {
+            let cgImage = try await imageGenerator.image(at: .zero).image
+            return NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+        } catch {
+            print("❌ Failed to generate video thumbnail: \(error)")
+            return nil
         }
     }
 }

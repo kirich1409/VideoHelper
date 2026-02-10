@@ -255,11 +255,11 @@ actor VideoProcessor {
         let exportPresetName: String
         switch preset {
         case .original:
-            exportPresetName = AVAssetExportPresetHEVCHighestQualityWithAlpha // Highest quality with thumbnail
+            exportPresetName = AVAssetExportPresetHEVCHighestQuality // Highest quality HEVC
         case .telegramSD:
-            exportPresetName = AVAssetExportPresetHEVC1280x720 // 720p
+            exportPresetName = AVAssetExportPreset1280x720 // 720p
         case .telegramHD:
-            exportPresetName = AVAssetExportPresetHEVC1920x1080 // 1080p
+            exportPresetName = AVAssetExportPreset1920x1080 // 1080p
         }
 
         guard let exportSession = AVAssetExportSession(asset: composition, presetName: exportPresetName) else {
@@ -285,6 +285,8 @@ actor VideoProcessor {
             let progress = exportSession.progress
             let elapsed = Date().timeIntervalSince(startTime)
             let estimatedRemaining = calculateRemainingTime(progress: progress, elapsed: elapsed)
+
+            print("📊 Progress: \(progress), Remaining: \(estimatedRemaining ?? 0)s, Status: \(exportSession.status.rawValue)")
 
             await MainActor.run {
                 progressHandler(progress, estimatedRemaining)
