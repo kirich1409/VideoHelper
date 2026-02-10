@@ -27,11 +27,22 @@ jobs:
     - name: Clean build folder
       run: xcodebuild clean -project VideoHelper.xcodeproj -scheme VideoHelper
 
-    - name: Build project
+    - name: Build main app target
       run: |
         xcodebuild build \
           -project VideoHelper.xcodeproj \
-          -scheme VideoHelper \
+          -target VideoHelper \
+          -configuration Debug \
+          -destination 'platform=macOS' \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+
+    - name: Build unit tests target
+      run: |
+        xcodebuild build \
+          -project VideoHelper.xcodeproj \
+          -target VideoHelperTests \
           -configuration Debug \
           -destination 'platform=macOS' \
           CODE_SIGN_IDENTITY="" \
