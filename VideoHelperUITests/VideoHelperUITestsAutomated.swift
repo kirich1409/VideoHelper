@@ -1,5 +1,6 @@
 import XCTest
 
+@MainActor
 final class VideoHelperUITestsAutomated: XCTestCase {
 
     var app: XCUIApplication!
