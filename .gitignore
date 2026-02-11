@@ -1,11 +1,15 @@
-# Xcode
-*.xcodeproj/*
-!*.xcodeproj/project.pbxproj
-!*.xcodeproj/xcshareddata/
-!*.xcodeproj/project.xcworkspace/
-*.xcworkspace/*
-!*.xcworkspace/contents.xcworkspacedata
-!*.xcworkspace/xcshareddata/
+# Tuist generated files
+.tuist
+*.xcodeproj
+*.xcworkspace
+!*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+Derived/
+
+# Keep manifest files
+!Tuist.swift
+!Project.swift
+!Workspace.swift
+!Package.swift
 
 # User settings
 *.xcuserstate
