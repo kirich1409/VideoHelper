@@ -34,7 +34,7 @@ jobs:
       run: tuist build VideoHelper --configuration Debug
 
     - name: Run Unit Tests
-      run: tuist test VideoHelperTests --configuration Debug
+      run: tuist test --configuration Debug
 
     # UI tests are skipped in CI due to XCTest + Swift 6 concurrency compilation issues on GitHub Actions
     # They work fine locally with SWIFT_STRICT_CONCURRENCY=minimal setting

@@ -38,7 +38,7 @@ tuist generate
 tuist build VideoHelper
 
 # Run tests
-tuist test VideoHelperTests
+tuist test
 ```
 
 ### Modifying Project Structure

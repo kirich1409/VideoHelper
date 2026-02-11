@@ -29,11 +29,11 @@ tuist build VideoHelper
 ### Run Tests
 
 ```bash
-# Unit tests
-tuist test VideoHelperTests
-
-# All tests
+# Run all tests
 tuist test
+
+# Run with specific configuration
+tuist test --configuration Debug
 ```
 
 ### Edit Manifests in Xcode
