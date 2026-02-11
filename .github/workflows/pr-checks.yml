@@ -24,39 +24,17 @@ jobs:
     - name: Show available SDKs
       run: xcodebuild -showsdks
 
-    - name: Clean build folder
-      run: xcodebuild clean -project VideoHelper.xcodeproj -scheme VideoHelper
+    - name: Install Tuist
+      run: brew install --cask tuist
 
-    - name: Build and test (unit tests only)
-      run: |
-        xcodebuild test \
-          -project VideoHelper.xcodeproj \
-          -scheme VideoHelper \
-          -destination 'platform=macOS' \
-          -only-testing:VideoHelperTests \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO \
-          EXCLUDED_SOURCE_FILE_NAMES='VideoHelperUITests/*'
-        # TODO: Remove EXCLUDED_SOURCE_FILE_NAMES when XCTest fully supports Swift 6 strict concurrency
-        # This workaround excludes UI tests from compilation due to XCUIApplication MainActor isolation issues
+    - name: Generate Xcode project
+      run: tuist generate
 
-    - name: Install xcpretty
-      run: gem install xcpretty
-      continue-on-error: true
+    - name: Build VideoHelper (Debug)
+      run: tuist build VideoHelper --configuration Debug
 
-    - name: Check for build warnings
-      run: |
-        xcodebuild build \
-          -project VideoHelper.xcodeproj \
-          -target VideoHelper \
-          -configuration Debug \
-          -destination 'platform=macOS' \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO \
-          | xcpretty --color --report junit
-      continue-on-error: true
+    - name: Run Unit Tests
+      run: tuist test VideoHelperTests --configuration Debug
 
     # UI tests are skipped in CI due to XCTest + Swift 6 concurrency compilation issues on GitHub Actions
     # They work fine locally with SWIFT_STRICT_CONCURRENCY=minimal setting

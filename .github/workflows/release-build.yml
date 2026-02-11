@@ -30,6 +30,12 @@ jobs:
     - name: Show Xcode version
       run: xcodebuild -version
 
+    - name: Install Tuist
+      run: brew install --cask tuist
+
+    - name: Generate Xcode project
+      run: tuist generate
+
     - name: Clean build folder
       run: xcodebuild clean -project VideoHelper.xcodeproj -scheme VideoHelper
 
