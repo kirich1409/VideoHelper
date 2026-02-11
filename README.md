@@ -51,22 +51,19 @@ See [.github/workflows/README.md](.github/workflows/README.md) for details.
 
 ## Installation / Установка
 
-### Requirements / Требования
-- macOS 26.0 or later
-- Xcode 16.2 or later (for building from source)
+### Prerequisites / Требования
 
-### Building from Source / Сборка из исходников
+- macOS 14.0 or later
+- Xcode 15.0 or later
+- [Tuist](https://docs.tuist.dev/) - Install via `brew install --cask tuist`
 
-```bash
-# Clone the repository / Клонируйте репозиторий
-git clone https://github.com/kirich1409/VideoHelper.git
-cd VideoHelper
+### Getting Started
 
-# Open in Xcode / Откройте в Xcode
-open VideoHelper.xcodeproj
-
-# Build and run (⌘R)
-```
+1. Clone the repository
+2. Install Tuist: `brew install --cask tuist`
+3. Generate Xcode project: `tuist generate`
+4. Open `VideoHelper.xcodeproj` in Xcode
+5. Build and run (⌘R)
 
 ## Usage / Использование
 

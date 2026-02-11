@@ -12,17 +12,41 @@ VideoHelper is a native macOS application for adding custom thumbnails to videos
 
 ## Building and Running
 
+**Note**: This project uses Tuist for Xcode project generation. Always run `tuist generate` after pulling changes or modifying manifest files.
+
+### First Time Setup
+
 ```bash
+# Install Tuist (one-time)
+brew install --cask tuist
+
+# Generate Xcode project from manifests
+tuist generate
+
 # Open project in Xcode
 open VideoHelper.xcodeproj
+```
+
+### Daily Development
+
+```bash
+# Regenerate project if manifests changed
+tuist generate
 
 # Build and run (⌘R in Xcode)
 # Or via command line:
-xcodebuild -scheme VideoHelper -configuration Debug build
+tuist build VideoHelper
 
 # Run tests
-xcodebuild test -scheme VideoHelper -destination 'platform=macOS'
+tuist test VideoHelperTests
 ```
+
+### Modifying Project Structure
+
+- Edit `Project.swift` to change targets, dependencies, or settings
+- Edit `Package.swift` to add Swift package dependencies
+- Run `tuist generate` to regenerate the Xcode project
+- Never edit the .xcodeproj file directly (it's gitignored and regenerated)
 
 The app is sandboxed and requires security-scoped resource access for file operations.
 
