@@ -34,5 +34,44 @@ let project = Project(
                 ]
             )
         ),
+        .target(
+            name: "VideoHelperTests",
+            destinations: .macOS,
+            product: .unitTests,
+            bundleId: "dev.androidbroadcast.VideoHelperTests",
+            deploymentTargets: .macOS("14.0"),
+            infoPlist: .default,
+            sources: ["VideoHelperTests/**/*.swift"],
+            dependencies: [
+                .target(name: "VideoHelper")
+            ],
+            settings: .settings(
+                configurations: [
+                    .debug(name: "Debug", xcconfig: "./xcconfigs/VideoHelper-Tests.xcconfig"),
+                    .release(name: "Release", xcconfig: "./xcconfigs/VideoHelper-Tests.xcconfig"),
+                ]
+            )
+        ),
+        .target(
+            name: "VideoHelperUITests",
+            destinations: .macOS,
+            product: .uiTests,
+            bundleId: "dev.androidbroadcast.VideoHelperUITests",
+            deploymentTargets: .macOS("14.0"),
+            infoPlist: .default,
+            sources: ["VideoHelperUITests/**/*.swift"],
+            dependencies: [
+                .target(name: "VideoHelper")
+            ],
+            settings: .settings(
+                base: [
+                    "SWIFT_STRICT_CONCURRENCY": "minimal"
+                ],
+                configurations: [
+                    .debug(name: "Debug", xcconfig: "./xcconfigs/VideoHelper-UITests.xcconfig"),
+                    .release(name: "Release", xcconfig: "./xcconfigs/VideoHelper-UITests.xcconfig"),
+                ]
+            )
+        ),
     ]
 )
